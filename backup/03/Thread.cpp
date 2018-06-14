@@ -65,6 +65,7 @@ void Thread::start(){
     if(pthread_create(&pthreadId_, NULL, &startThread, data)){
         started_ = false;
         delete data;
+        printf("I am here in Thread::start()");
         // do some logging things
     }
     else{
