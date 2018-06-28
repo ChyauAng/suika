@@ -18,4 +18,8 @@
     (Condition.h, Condition.cpp, Mutex.h, CountDownLatch.h CountDownLatch.cpp) <br>
 
 * task04: <br>
+    Acceptor Implementation and some encapsulation work. <br>
+    (Acceptor.h Acceptor.cpp SocketsOps.h SocketsOps.cpp InetAddress.h InetAddress.cpp Socket.h Socket.cpp Endian.h) <br>
+
+* task05: <br>
 
