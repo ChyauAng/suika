@@ -22,4 +22,7 @@
     (Acceptor.h Acceptor.cpp SocketsOps.h SocketsOps.cpp InetAddress.h InetAddress.cpp Socket.h Socket.cpp Endian.h) <br>
 
 * task05: <br>
+    Simple TcpServer and TcpConnection with create and passsive close implementation. <br>
+    (TcpServer.h TcpSerevr.cpp TcpConnection.h TcpConnection.cpp) <br>
 
+* task06: <br>
