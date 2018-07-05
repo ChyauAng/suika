@@ -19,7 +19,7 @@ InetAddress::InetAddress(uint16_t port, bool loopbackOnly, bool ipv6){
     }
     else{
         bzero(&addr_, sizeof addr_);
-        addr_.sin_family = AF_INET6;
+        addr_.sin_family = AF_INET;
         in_addr_t ip = loopbackOnly ? KInaddrLoopback : KInaddrAny;
         addr_.sin_addr.s_addr = hostToNetwork32(ip);
         addr_.sin_port = hostToNetwork16(port);
