@@ -33,4 +33,8 @@
     (EventLoopThreadPool.h EventLoopThreadPool.cpp) <br>
 
 * task08: <br>
+    TcpClient implementation. <br>
+    (TcpClient.h TcpClient.cpp Connector.h Connector.cpp) <br>
+
+* task09: <br>
 

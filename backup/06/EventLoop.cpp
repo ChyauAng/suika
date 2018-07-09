@@ -165,7 +165,7 @@ void EventLoop::removeChannel(Channel* channel){
     
     // to do: take this channel being active channel or not into consideration
     if(eventHandling_){
-        assert(currentActiveChannel_ != channel || std::find(activeChannels_.begin(), activeChannels_.end(), channel) == activeChannels_.end());
+        assert(currentActiveChannel_ == channel || std::find(activeChannels_.begin(), activeChannels_.end(), channel) == activeChannels_.end());
     }
 
     poller_->removeChannel(channel);

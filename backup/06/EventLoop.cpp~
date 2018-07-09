@@ -58,13 +58,13 @@ void EventLoop::loop(){
     assertInLoopThread();
     looping_ = true;
     quit_ = false;
+    eventHandling_ = true;
     while(!quit_){
         activeChannels_.clear();
         poller_->poll(kPollTimeMs, &activeChannels_);
         // assert(!activeChannels_.empty());
         // printf("I am here: EventLoop::loop() after poll.\n");
 
-        eventHandling_ = true;
         for(ChannelList::iterator it = activeChannels_.begin(); it != activeChannels_.end(); ++it){
             currentActiveChannel_ = *it;
             currentActiveChannel_->handleEvent();
@@ -165,7 +165,7 @@ void EventLoop::removeChannel(Channel* channel){
     
     // to do: take this channel being active channel or not into consideration
     if(eventHandling_){
-        assert(currentActiveChannel_ == channel || std::find(activeChannels_.begin(), activeChannels_.end(), channel) == activeChannels_.end());
+        assert(currentActiveChannel_ != channel || std::find(activeChannels_.begin(), activeChannels_.end(), channel) == activeChannels_.end());
     }
 
     poller_->removeChannel(channel);
