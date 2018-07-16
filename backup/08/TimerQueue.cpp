@@ -120,7 +120,7 @@ void TimerQueue::handleRead(){
 }
 
 std::vector<TimerQueue::Entry> TimerQueue::getExpired(Timestamp now){
-    assert(!timers_.size() == activeTimers_.size());
+    assert(timers_.size() == activeTimers_.size());
     std::vector<Entry> expired;
     Entry sentry(now, reinterpret_cast<Timer*>(UINTPTR_MAX));
     TimerList::iterator end = timers_.lower_bound(sentry);

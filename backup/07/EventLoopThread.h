@@ -22,7 +22,6 @@ private:
     void threadFunc();
 
     EventLoop* loop_;
-    bool existing_;
     Thread thread_;
     MutexLock mutex_;
     Condition cond_;

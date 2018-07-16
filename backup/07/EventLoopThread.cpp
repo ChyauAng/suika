@@ -6,7 +6,6 @@
 /*
 EventLoopThread::EventLoopThread(): 
     loop_(NULL),
-    existing_(false),
     thread_(std::bind(&EventLoopThread::threadFunc, this)),
     mutex_(),
     cond_(mutex_),
@@ -15,7 +14,6 @@ EventLoopThread::EventLoopThread():
 }
 */
 EventLoopThread::EventLoopThread(const ThreadInitCallback& cb):      loop_(NULL),
-    existing_(false),
     thread_(std::bind(&EventLoopThread::threadFunc, this)),
     mutex_(),
     cond_(mutex_),
@@ -24,7 +22,6 @@ EventLoopThread::EventLoopThread(const ThreadInitCallback& cb):      loop_(NULL)
 }
 
 EventLoopThread::~EventLoopThread(){
-    existing_ = true;
     if(loop_ != NULL){
         // not 100% thread safe
         loop_->quit();
@@ -63,7 +60,6 @@ void EventLoopThread::threadFunc(){
     }
 
     loop.loop();
-    // assert(existing_);
     loop_ = NULL;
 }
 
