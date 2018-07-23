@@ -41,3 +41,7 @@
     (EPollPoller.h EPollPoller.cpp) <br>
 
 * task10: <br>
+    Asynchronous multi-threads logging mechanism with four buffers implementation. <br>
+    (Logging.h Logging.cpp AsyncLogging.h AsyncLogging.cpp LogFile.h LogFile.cpp LogStream.h LogStream.cpp FileUtil.h FileUtil.cpp) <br>
+
+* task11: <br>
