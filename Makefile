@@ -18,7 +18,8 @@ CXXFLAGS := $(CFLAGS) -std=c++11 -pthread
 .PHONY : all clean rebuild
 
 all: $(TARGET)
-clean: rm -f *.o
+clean: 
+	rm -f *.o
 	rm $(TARGET)
 rebuild: clean all
 
