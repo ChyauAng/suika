@@ -38,6 +38,20 @@ public:
         return begin() + readerIndex_;
     }
 
+    const char* findCRLF() const{
+        // const char* crlf = std::search(peek(), beginWrite(), kCRLF, kCRLF + 2);
+        const char* crlf = static_cast<const char*>(memmem(peek(), readableBytes(), kCRLF, 2));
+        return crlf == beginWrite() ? NULL : crlf;
+    }
+
+    const char* findCRLF(const char* start) const{
+        assert(peek() <= start);
+        assert(start <= beginWrite());
+        // const char* crlf = std::search(peek(), beginWrite(), kCRLF, kCRLF + 2);
+        const char* crlf = static_cast<const char*>(memmem(peek(), readableBytes(), kCRLF, 2));
+        return crlf == beginWrite()? NULL : crlf;
+    }
+
     void retrieve(size_t len){
         assert(len <= readableBytes());
         if(len < readableBytes()){
@@ -51,6 +65,23 @@ public:
     void retrieveAll(){
         readerIndex_ = KCheapPrepend;
         writerIndex_ = KCheapPrepend;
+    }
+
+    void retrieveUntil(const char* end){
+        assert(peek() <= end);
+        assert(end <= beginWrite());
+        retrieve(end - peek());
+    }
+
+    string retrieveAllAsString(){
+        int length = readableBytes();
+        string result(peek(), length);
+        retrieve(length);
+        return result;
+    }
+    
+    void append(const StringPiece& str){
+        append(str.data(), str.size());
     }
 
     void append(const char* data, size_t len){
@@ -134,6 +165,8 @@ private:
     std::vector<char> buffer_;
     size_t readerIndex_;
     size_t writerIndex_;
+
+    static const char kCRLF[];
 };
 
 #endif

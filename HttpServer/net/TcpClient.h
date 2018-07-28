@@ -42,16 +42,16 @@ public:
     }
     
     // not thread safe
-    void setConnectionCallback(const ConnectionCallback& cb){
-        connectionCallback_ = cb;
+    void setConnectionCallback(ConnectionCallback&& cb){
+        connectionCallback_ = std::move(cb);
     }
 
-    void setMessageCallback(const MessageCallback& cb){
-        messageCallback_ = cb;
+    void setMessageCallback(MessageCallback&& cb){
+        messageCallback_ = std::move(cb);
     }
 
-    void setWriteCompleteCallback(const WriteCompleteCallback& cb){
-        writeCompleteCallback_ = cb;
+    void setWriteCompleteCallback(WriteCompleteCallback&& cb){
+        writeCompleteCallback_ = std::move(cb);
     }
 
 private:

@@ -8,6 +8,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <strings.h>
 
 class Acceptor;
 class EventLoop;
@@ -41,6 +42,14 @@ public:
         return threadPool_;
     }
 
+    const string& getIpPort() const{
+        return ipPort_;
+    }
+
+    EventLoop* getLoop()const {
+        return loop_;
+    }
+
 private:
     void newConnection(int sockfd, const InetAddress& peerAddr);
     void removeConnection(const TcpConnectionPtr& conn);
@@ -61,6 +70,8 @@ private:
 
     AtomicInt32 started_;
     int nextConnId_;
+
+    const string ipPort_;
 };
 
 #endif

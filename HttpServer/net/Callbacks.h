@@ -16,8 +16,8 @@ typedef std::function<void (const TcpConnectionPtr&)> ConnectionCallback;
 // implementation in TcpConnetcion.cc in muduo project
 void defaultConnectionCallback(const TcpConnectionPtr& conn);
 
-typedef std::function<void (const TcpConnectionPtr&, Buffer*, int)> MessageCallback;
-void defaultMessageCallback(const TcpConnectionPtr& conn, Buffer*, int n);
+typedef std::function<void (const TcpConnectionPtr&, Buffer*, Timestamp)> MessageCallback;
+void defaultMessageCallback(const TcpConnectionPtr& conn, Buffer*, Timestamp);
 
 
 typedef std::function<void (const TcpConnectionPtr&)> CloseCallback;

@@ -13,7 +13,7 @@ void defaultConnectionCallback(const TcpConnectionPtr& conn){
     // do some log things
 }
 
-void defaultMessageCallback(const TcpConnectionPtr& conn, Buffer*, int n){
+void defaultMessageCallback(const TcpConnectionPtr& conn, Buffer*, Timestamp t){
     //
 }
 
@@ -24,7 +24,8 @@ TcpServer::TcpServer(EventLoop* loop, const InetAddress& listenAddr, const std::
     connectionCallback_(defaultConnectionCallback),
     messageCallback_(defaultMessageCallback),
     nextConnId_(1),
-    threadPool_(new EventLoopThreadPool(loop, nameArg)){
+    threadPool_(new EventLoopThreadPool(loop, nameArg)),
+    ipPort_(listenAddr.toIpPort()){
     acceptor_->setNewConnectionCallback(std::bind(&TcpServer::newConnection, this, std::placeholders::_1, std::placeholders::_2));
 }
 

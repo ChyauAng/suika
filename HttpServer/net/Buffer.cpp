@@ -9,6 +9,8 @@ inline To implicit_cast(From const& f){
     return f;
 }
 
+const char Buffer::kCRLF[] = "\r\n";
+
 const size_t Buffer::KCheapPrepend;
 const size_t Buffer::KInitialSize;
 

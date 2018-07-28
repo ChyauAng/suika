@@ -25,7 +25,7 @@ TcpConnection::TcpConnection(EventLoop* loop, const string& nameArg, int sockfd,
     peerAddr_(peerAddr),
     highWaterMark_(64 * 1024 * 1024){
         // do not use make_shared() in ctor
-        channel_->setReadCallback(std::bind(&TcpConnection::handleRead, this));
+        channel_->setReadCallback(std::bind(&TcpConnection::handleRead, this, std::placeholders::_1));
         channel_->setWriteCallback(std::bind(&TcpConnection::handleWrite, this));
         channel_->setCloseCallback(std::bind(&TcpConnection::handleClose, this));
         channel_->setErrorCallback(std::bind(&TcpConnection::handleError, this));
@@ -100,6 +100,22 @@ void TcpConnection::send(const std::string& message){
     }
 }
 
+
+void TcpConnection::send(Buffer* buf){
+    if(state_ == KConnected){
+        if(loop_->isInLoopThread()){
+            sendInLoop(buf->peek(), buf->readableBytes());
+            buf->retrieveAll();
+        }
+        else{
+            // pass data through different threads
+            // need to be improved.
+            string s(buf->retrieveAllAsString());
+            loop_->runInLoop(std::bind(&TcpConnection::sendInLoop, shared_from_this(), s.data(), s.size()));
+        }
+    }
+}
+
 void TcpConnection::forceCloseInLoop(){
     loop_->assertInLoopThread();
     if(state_ == KConnected || state_ == KDisconnecting){
@@ -137,12 +153,12 @@ void TcpConnection::shutdownInLoop(){
     }
 }
 
-void TcpConnection::handleRead(){
+void TcpConnection::handleRead(Timestamp t){
     int savedErrno = 0;
     ssize_t n = inputBuffer_.readFd(channel_->fd(), &savedErrno);
 
     if(n > 0){
-        messageCallback_(shared_from_this(), &inputBuffer_, n);
+        messageCallback_(shared_from_this(), &inputBuffer_, t);
     }
     else if(n == 0){
         handleClose();

@@ -1,52 +1,40 @@
-# My Reactor implementation <br>
-(Reference: [muduo project](https://github.com/chenshuo/muduo)) <br>
+# myReactor: a reactor implementation
+## myServer: a http server implementation based on myReactor
 
-* task00: <br>
-    A do-nothing event loop. <br>
-    (config.h CurrentThread.cpp CurrentThread.h EventLoop.cpp EventLoop.h main.cpp Makefile notCopyable.h Thread.cpp Thread.h) <br>
+## 测试环境
+* OS：Ubuntu 16.10
+* 内存：8G
+* CPU：I5-6300HQ
 
-* task01: <br>
-    Prototype of reactor: Channel, Poller. <br>
-    (Channel.cpp Channel.h Poller.cpp Poller.h Timestamp.cpp Timestamp.h) <br>
+## 测试工具
+* [WebBench](https://github.com/linyacool/WebServer/tree/master/WebBench)
 
-* task02: <br>
-    TimerQueue implementation. <br>
-    (Atomic.h Timer.h Timer.cpp TimerId.h TimerQueue.h TimerQueue.cpp) <br>
 
-* task03: <br>
-    EventLoop::runInLoop(), EventLoopThread, Mutex, Condition, CountDownLatch <br>
-    (Condition.h, Condition.cpp, Mutex.h, CountDownLatch.h CountDownLatch.cpp) <br>
+## [测试方法](https://github.com/linyacool/WebServer/blob/master/%E6%B5%8B%E8%AF%95%E5%8F%8A%E6%94%B9%E8%BF%9B.md)
 
-* task04: <br>
-    Acceptor Implementation and some encapsulation work. <br>
-    (Acceptor.h Acceptor.cpp SocketsOps.h SocketsOps.cpp InetAddress.h InetAddress.cpp Socket.h Socket.cpp Endian.h) <br>
 
-* task05: <br>
-    Simple TcpServer and TcpConnection with create and passsive close implementation. <br>
-    (TcpServer.h TcpSerevr.cpp TcpConnection.h TcpConnection.cpp) <br>
+## 测试结果及分析
+测试截图放在最后  
 
-* task06: <br>
-    TcpConnection read and write implementation with buffer. <br>
+| 服务器 | 短连接QPS | 长连接QPS | 
+| - | :-: | -: | 
+| myServer | 48845| 153570 | 
+| Muduo | 46374 | 118139 | 
 
-* task07: <br>
-    Multi-threads TcpServer implementation. <br>
-    (EventLoopThreadPool.h EventLoopThreadPool.cpp) <br>
+* analysis 1 
+* analysis 2
+* analysis 3
 
-* task08: <br>
-    TcpClient implementation. <br>
-    (TcpClient.h TcpClient.cpp Connector.h Connector.cpp) <br>
 
-* task09: <br>
-    Level-triggered EPollPoller implementation. <br>
-    (EPollPoller.h EPollPoller.cpp) <br>
-
-* task10: <br>
-    Asynchronous multi-threads logging mechanism with four buffers implementation. <br>
-    (Logging.h Logging.cpp AsyncLogging.h AsyncLogging.cpp LogFile.h LogFile.cpp LogStream.h LogStream.cpp FileUtil.h FileUtil.cpp) <br>
-
-* task11: <br>
-    A little step beyond muduo. <br>
-    (Done: Acceptor::handleRead(), Buffer::makeSpace(), EventLoop::loop(), EventLoop::runInLoop(), TcpConnection::sendInLoop(), TcpConnection::shutdown(), Connector::start(), Connector::stop(), Connector::connecting(), Connector::removeAndReset(); <br>
-    Todo: <br> 
-    the possible double destruct problem in TcpServer::newConnection() && TcpServer::removeConnection(), TcpClient::newConnection() && TcpClient::~TcpClient(); <br>
-    add TimerPool.) <br>
+## 测试结果截图
+* myServer短连接测试  
+![shortMyServer](https://github.com/ChyauAng/myReactor/blob/master/resources/myServer.png)
+* muduo短连接测试  
+![shortMuduo](https://github.com/ChyauAng/myReactor/blob/master/resources/muduo.png)
+* myServer长连接测试  
+![keepMyServer](https://github.com/ChyauAng/myReactor/blob/master/resources/myServerK.png)
+* muduo长连接测试  
+![keepMuduo](https://github.com/ChyauAng/myReactor/blob/master/resources/muduoK.png)
+* myServer空闲负载  
+* myServer短连接CPU负载  
+* myServer长连接CPU负载  

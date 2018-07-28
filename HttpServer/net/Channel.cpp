@@ -35,21 +35,21 @@ void Channel::remove(){
     loop_->removeChannel(this);
 }
 
-void Channel::handleEvent(){
+void Channel::handleEvent(Timestamp t){
     std::shared_ptr<void> guard;
     if(tied_){
         // weak_ptr --> shared_ptr
         guard = tie_.lock();
         if(guard){
-            handleEventWithGuard();
+            handleEventWithGuard(t);
         }
     }
     else{
-        handleEventWithGuard();
+        handleEventWithGuard(t);
     }
 }
 
-void Channel::handleEventWithGuard(){
+void Channel::handleEventWithGuard(Timestamp t){
     eventHandling_ = true;
 
     // printf("I am here: Channel::handleEventWithGuard");
@@ -76,7 +76,7 @@ void Channel::handleEventWithGuard(){
     if(revents_ & (POLLIN | POLLPRI | POLLRDHUP)){
         if(readCallback_){
             // printf("I am here: Channel::handleEventWithGuard--readCallback_()\n");
-            readCallback_();
+            readCallback_(t);
         }
     }
 

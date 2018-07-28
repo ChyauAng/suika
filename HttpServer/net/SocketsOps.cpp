@@ -1,5 +1,6 @@
 #include "SocketsOps.h"
 #include "Endian.h"
+#include "Logging.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -44,7 +45,7 @@ const struct sockaddr_in6* sockaddr_in6_cast(const struct sockaddr* addr){
 int createNonblockingOrDie(sa_family_t family){
     int sockfd = ::socket(family, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
     if(sockfd < 0){
-        // LOG_SYSFATAL << "createNonblockingOrDie in SockerOps.cpp."
+        LOG_SYSFATAL << "createNonblockingOrDie in SockerOps.cpp.";
         // printf("Error in Sockets::createNonblockinOrDie\n");
     }
     return sockfd;
@@ -57,7 +58,7 @@ int connect(int sockfd, const struct sockaddr* addr){
 void bindOrDie(int sockfd, const struct sockaddr* addr){
     int ret = ::bind(sockfd, addr, sizeof(struct sockaddr_in6));
     if(ret < 0){
-        // LOG_SYSFATAL << "bindOrDie in SocketsOPs.cpp.";
+        LOG_SYSFATAL << "bindOrDie in SocketsOPs.cpp.";
         // printf("The errno is %d", errno);
         // printf("Error in SocketsOps::bindOrDie\n");
     }
@@ -67,7 +68,7 @@ void listenOrDie(int sockfd){
     int ret = ::listen(sockfd, SOMAXCONN);
     if(ret < 0){
         // printf("Error in SocketsOps::listenOrDie\n");
-        // LOG_SYSFATAL << "listenOrDie in SocketsOPs.cpp";
+        LOG_SYSFATAL << "listenOrDie in SocketsOPs.cpp";
     }
 }
 
@@ -102,10 +103,10 @@ int accept(int sockfd, struct sockaddr_in6* addr){
             case ENOTSOCK:
             case EOPNOTSUPP:
                 // unexpected errors
-                // LOG_FATAL << "unexpected error of accpet "<< savedErrno;
+                LOG_FATAL << "unexpected error of accpet "<< savedErrno;
                 break;
             default:
-                // LOG_FATAL << "unexpected error of accpet "<< savedErrno;
+                LOG_FATAL << "unexpected error of accpet "<< savedErrno;
                 break;
         }
     }
@@ -128,15 +129,15 @@ ssize_t write(int sockfd, const void* buf, size_t count){
 void close(int sockfd){
     if(::close(sockfd) < 0){
         // printf("Error in SocketsOps::close\n");
-        // LOG_SYSERR << "close in SocketsOps.cpp";
+        LOG_SYSERR << "close in SocketsOps.cpp";
     }
 }
 
 // half-close in tcp
 void shutdownWrite(int sockfd){
     if(::shutdown(sockfd, SHUT_WR) < 0){
-        printf("Error in sockets::shutdownWrite\n");
-        // LOG_SYSERR << "shiutdownWrite in SockertsOps.cpp";
+        // printf("Error in sockets::shutdownWrite\n");
+        LOG_SYSERR << "shiutdownWrite in SockertsOps.cpp";
     }
 }
 
@@ -167,7 +168,7 @@ void fromIpPort(const char* ip, uint16_t port, struct sockaddr_in* addr){
     addr->sin_port = hostToNetwork16(port);
     if(::inet_pton(AF_INET, ip, &addr->sin_addr) <= 0){
         // printf("Error in SocketsOps::fromIpPort.\n");
-        // LOG_SYSERR << "FromIpPort in SocketsOPs.cpp";
+        LOG_SYSERR << "FromIpPort in SocketsOPs.cpp";
     }
 }
 
@@ -176,7 +177,7 @@ void fromIpPort(const char* ip, uint16_t port, struct sockaddr_in6* addr){
     addr->sin6_port = hostToNetwork16(port);
     if(::inet_pton(AF_INET6, ip, &addr->sin6_addr) <= 0){
         // printf("Error in SocketsOps::fromIpPort.\n");
-        // LOG_SYSERR << "FromIpPort in SocketsOPs.cpp";
+        LOG_SYSERR << "FromIpPort in SocketsOPs.cpp";
     }
 }
 
@@ -198,7 +199,7 @@ struct sockaddr_in6 getLocalAddr(int sockfd){
     bzero(&localaddr, sizeof localaddr);
     socklen_t addrlen = static_cast<socklen_t>(sizeof localaddr);
     if(::getsockname(sockfd, sockaddr_cast(&localaddr), &addrlen) < 0){
-        // LOG_SYSERR << "getLocalAddr in SocketsOps.cpp";
+        LOG_SYSERR << "getLocalAddr in SocketsOps.cpp";
         // printf("Error in sockets::getLocalAddr\n");
     }
     return localaddr;
@@ -209,7 +210,7 @@ struct sockaddr_in6 getPeerAddr(int sockfd){
     bzero(&peeraddr, sizeof peeraddr);
     socklen_t addrlen = static_cast<socklen_t>(sizeof peeraddr);
     if(::getpeername(sockfd, sockaddr_cast(&peeraddr), &addrlen) < 0){
-        // LOG_SYSERR << "getPeerAddr in SocketsOPs.cpp";
+        LOG_SYSERR << "getPeerAddr in SocketsOPs.cpp";
         // printf("Error in sockets::getPeerAddr\n");
     }
     return peeraddr;
