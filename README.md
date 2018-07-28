@@ -45,3 +45,8 @@
     (Logging.h Logging.cpp AsyncLogging.h AsyncLogging.cpp LogFile.h LogFile.cpp LogStream.h LogStream.cpp FileUtil.h FileUtil.cpp) <br>
 
 * task11: <br>
+    A little step beyond muduo. <br>
+    (Done: Acceptor::handleRead(), Buffer::makeSpace(), EventLoop::loop(), EventLoop::runInLoop(), TcpConnection::sendInLoop(), TcpConnection::shutdown(), Connector::start(), Connector::stop(), Connector::connecting(), Connector::removeAndReset(); <br>
+    Todo: <br> 
+    the possible double destruct problem in TcpServer::newConnection() && TcpServer::removeConnection(), TcpClient::newConnection() && TcpClient::~TcpClient(); <br>
+    add TimerPool.) <br>
