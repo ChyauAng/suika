@@ -40,10 +40,18 @@ TimerQueue::~TimerQueue(){
     }
 }
 
-
+/*
 TimerId TimerQueue::addTimer(const TimerCallback& cb, Timestamp when, double interval){
     // TODO: use TimerPool to avoid cost of new operation 
     Timer* timer = new Timer(cb, when, interval);
+    loop_->runInLoop(std::bind(&TimerQueue::addTimerInLoop, this, timer));
+    return TimerId(timer, timer->sequence());
+}
+*/
+
+TimerId TimerQueue::addTimer(TimerCallback&& cb, Timestamp when, double interval){
+    // TODO: use TimerPool to avoid cost of new operation 
+    Timer* timer = new Timer(std::move(cb), when, interval);
     loop_->runInLoop(std::bind(&TimerQueue::addTimerInLoop, this, timer));
     return TimerId(timer, timer->sequence());
 }

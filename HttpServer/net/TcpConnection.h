@@ -5,6 +5,7 @@
 #include "InetAddress.h"
 #include "notCopyable.h"
 #include "StringPiece.h"
+#include "AnyType.h"
 
 #include <string>
 #include <memory>
@@ -75,9 +76,21 @@ public:
 
     void send(const void* message, int len);
     void send(const std::string& message);
+    void send(Buffer* buf);
+
     void shutdown();
 
     void forceClose();
+
+    void setContext(const Any& context){
+        context_ = context;
+    }
+    const Any& getContext()const{
+        return context_;
+    }
+    Any* getNonConstContext(){
+        return &context_;
+    }
 
 private:
     enum StateE { KConnecting, KConnected, KDisconnecting, KDisconnected};
@@ -85,7 +98,7 @@ private:
         state_ = s;
     }
 
-    void handleRead();
+    void handleRead(Timestamp t);
     void handleWrite();
     void handleClose();
     void handleError();
@@ -110,6 +123,8 @@ private:
 
     Buffer inputBuffer_;
     Buffer outputBuffer_;
+
+    Any context_;
 };
 
 

@@ -1,16 +1,19 @@
-TARGET := main
+TARGET := HttpServer_test
 
 SOURCE := $(wildcard *.c) $(wildcard *.cpp)
 OBJS := $(patsubst %.c, %.o, $(patsubst %.cpp, %.o, $(SOURCE)))
 
+MYREACTOR_SRC := $(wildcard ../../net/*.cpp)
+MYREACTOR_OBJS := $(patsubst %.cpp, %.o, $(MYREACTOR_SRC))
+
 CC := gcc
 CXX := g++
 
-LIBS :=
-LDFLAGS :=
+LIBS :=  ../../net/libmyreactor.a
+LDFLAGS :=  
 
 DEFINES :=
-INCLUDE :=
+INCLUDE := -I .  
 
 CFLAGS := -g -Wall -o3 $(DEFINES) $(INCLUDE)
 CXXFLAGS := $(CFLAGS) -std=c++11 -pthread

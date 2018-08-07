@@ -35,15 +35,22 @@ public:
 
     void quit();
 
-    TimerId runAt(const Timestamp& time, const TimerCallback& cb);
-    TimerId runAfter(double delay,const TimerCallback& cb);
-    TimerId runEvery(double interval, const TimerCallback& cb);
+    // TimerId runAt(const Timestamp& time, const TimerCallback& cb);
+    // TimerId runAfter(double delay,const TimerCallback& cb);
+    // TimerId runEvery(double interval, const TimerCallback& cb);
     
     // schedules the task during different threads.
     // run the callback fuction when in the current IO thread, otherwise add into the task queue of the thread.
-    void runInLoop(const Functor& cb);
+    // void runInLoop(const Functor& cb);
     // add the callback function into the task queue of the current thread.
-    void queueInLoop(const Functor& cb);
+    // void queueInLoop(const Functor& cb);
+    
+    TimerId runAt(const Timestamp& time, TimerCallback&& cb);
+    TimerId runAfter(double delay, TimerCallback&& cb);
+    TimerId runEvery(double interval, TimerCallback&& cb);
+
+    void runInLoop(Functor&& cb);
+    void queueInLoop(Functor&& cb);
     
     // internal usage
     void wakeup();

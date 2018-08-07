@@ -2,6 +2,7 @@
 #define _CHANNEL_H
 
 #include "notCopyable.h"
+#include "Timestamp.h"
 
 #include <functional>
 #include <memory>
@@ -11,24 +12,25 @@ class EventLoop;
 class Channel: public notCopyable{
 public:
     typedef std::function<void()> EventCallback;
+    typedef std::function<void(Timestamp)> ReadEventCallback;
     
     Channel(EventLoop* loop, int fd);
     ~Channel();
 
-    void handleEvent();
+    void handleEvent(Timestamp t);
 
-    void setReadCallback(const EventCallback& cb){
-        readCallback_ = cb;
+    void setReadCallback(ReadEventCallback&& cb){
+        readCallback_ = std::move(cb);
     }
-    void setWriteCallback(const EventCallback& cb){
-        writeCallback_ = cb;
+    void setWriteCallback(EventCallback&& cb){
+        writeCallback_ = std::move(cb);
     }
-    void setErrorCallback(const EventCallback& cb){
-        errorCallback_ = cb;
+    void setErrorCallback(EventCallback&& cb){
+        errorCallback_ = std::move(cb);
     }
 
-    void setCloseCallback(const EventCallback& cb){
-        closeCallback_ = cb;
+    void setCloseCallback(EventCallback&& cb){
+        closeCallback_ = std::move(cb);
     }
     
     // avoid the owner object being destoryed during handleEvent
@@ -100,7 +102,7 @@ public:
 private:
     void update();
 
-    void handleEventWithGuard();
+    void handleEventWithGuard(Timestamp t);
     
     static const int kNoneEvent;
     static const int kReadEvent;
@@ -118,7 +120,7 @@ private:
     int index_;
     bool addedToLoop_;
 
-    EventCallback readCallback_;
+    ReadEventCallback readCallback_;
     EventCallback writeCallback_;
     EventCallback errorCallback_;
     EventCallback closeCallback_;

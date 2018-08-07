@@ -28,6 +28,10 @@ public:
         return this->microSecondsSinceEpoch() == rhs.microSecondsSinceEpoch();
     }
 
+    void swap(Timestamp& that){
+        std::swap(microSecondsSinceEpoch_, that.microSecondsSinceEpoch_);
+    }
+
     // for AsyncLogging
     std::string toFormattedString() const;
     

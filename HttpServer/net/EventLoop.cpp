@@ -67,7 +67,7 @@ void EventLoop::loop(){
         eventHandling_ = true;
         for(ChannelList::iterator it = activeChannels_.begin(); it != activeChannels_.end(); ++it){
             currentActiveChannel_ = *it;
-            currentActiveChannel_->handleEvent();
+            currentActiveChannel_->handleEvent(Timestamp::now());
         }
         currentActiveChannel_ = NULL;
         eventHandling_ = false;
@@ -85,42 +85,41 @@ void EventLoop::quit(){
      }
 }
 
-TimerId EventLoop::runAt(const Timestamp& time, const TimerCallback& cb){
-    return timerQueue_->addTimer(cb, time, 0.0);
+TimerId EventLoop::runAt(const Timestamp& time, TimerCallback&& cb){
+    return timerQueue_->addTimer(std::move(cb), time, 0.0);
 }
 
-TimerId EventLoop::runAfter(double delay, const TimerCallback& cb){
+TimerId EventLoop::runAfter(double delay, TimerCallback&& cb){
     Timestamp time(addTime(Timestamp::now(), delay));
-    return runAt(time, cb);
+    return runAt(time, std::move(cb));
 }
 
-TimerId EventLoop::runEvery(double interval, const TimerCallback& cb){
+TimerId EventLoop::runEvery(double interval, TimerCallback&& cb){
     Timestamp time(addTime(Timestamp::now(), interval));
-    return timerQueue_->addTimer(cb, time, interval);
+    return timerQueue_->addTimer(std::move(cb), time, interval);
 }
 
-void EventLoop::runInLoop(const Functor& cb){
+
+void EventLoop::runInLoop(Functor&& cb){
     if(isInLoopThread()){
         cb();
     }
     else{
-        // question: whether the duplication-removal is nesscessary?
-        // what if there is a task requiring a functor being executed twice?
-        // the possible necessarity: TcpServer::removeConnectionInLoop(), L99.
-        queueInLoop(cb);
+        queueInLoop(std::move(cb));
     }
 }
 
-void EventLoop::queueInLoop(const Functor& cb){
+void EventLoop::queueInLoop(Functor&& cb){
     {
         MutexLockGuard lock(mutex_);
-        pendingFunctors_.push_back(cb);
+        pendingFunctors_.push_back(std::move(cb));
     }
 
     if(!isInLoopThread() || callingPendingFunctors_){
         wakeup();
     }
 }
+
 
 void EventLoop::wakeup(){
     uint64_t one = 1;

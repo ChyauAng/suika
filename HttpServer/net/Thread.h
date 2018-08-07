@@ -11,7 +11,8 @@ class Thread: public notCopyable{
 public:
     typedef std::function<void ()> ThreadFunc;
 
-    explicit Thread(const ThreadFunc& func, const std::string& name = std::string("Anonymous"));
+    // explicit Thread(const ThreadFunc& func, const std::string& name = std::string("Anonymous"));
+    explicit Thread(ThreadFunc&& func, const std::string& name = std::string("Anonymous"));
     ~Thread();
 
     void start();

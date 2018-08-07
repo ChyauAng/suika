@@ -20,7 +20,9 @@ public:
     ~TimerQueue();
 
     // schedules the callback to be run at given time
-    TimerId addTimer(const TimerCallback& cb, Timestamp when, double interval);
+    // TimerId addTimer(const TimerCallback& cb, Timestamp when, double interval);
+    TimerId addTimer(TimerCallback&& cb, Timestamp when, double interval);
+
 
     void cancel(TimerId timerId);
 
