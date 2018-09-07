@@ -1,4 +1,4 @@
-# myReactorServer: a http server implementation based on myReactor
+# myReactorServer: a web server based on myReactor
 ## myReactor: a reactor implementation
 
 ## 测试环境
