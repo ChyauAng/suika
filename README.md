@@ -1,5 +1,5 @@
-# myReactor: a reactor implementation
-## myServer: a http server implementation based on myReactor
+# myReactorServer: a http server implementation based on myReactor
+## myReactor: a reactor implementation
 
 ## 测试环境
 * OS：Ubuntu 16.10
@@ -18,7 +18,7 @@
 
 | 服务器 | 短连接QPS | 长连接QPS | 
 | - | :-: | -: | 
-| myServer | 48845| 153570 | 
+| myReactorServer | 48845| 153570 | 
 | Muduo | 46374 | 118139 | 
 
 * analysis 1 
@@ -27,14 +27,14 @@
 
 
 ## 测试结果截图
-* myServer短连接测试  
+* myReactorServer短连接测试  
 ![shortMyServer](https://github.com/ChyauAng/myReactor/blob/master/resources/myServer.png)
 * muduo短连接测试  
 ![shortMuduo](https://github.com/ChyauAng/myReactor/blob/master/resources/muduo.png)
-* myServer长连接测试  
+* myReactorServer长连接测试  
 ![keepMyServer](https://github.com/ChyauAng/myReactor/blob/master/resources/myServerK.png)
 * muduo长连接测试  
 ![keepMuduo](https://github.com/ChyauAng/myReactor/blob/master/resources/muduoK.png)
-* myServer空闲负载  
-* myServer短连接CPU负载  
-* myServer长连接CPU负载  
+* myReactorServer空闲负载  
+* myReactorServer短连接CPU负载  
+* myReactorServer长连接CPU负载  
