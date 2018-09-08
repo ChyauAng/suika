@@ -9,7 +9,7 @@ protected:
 
 private:
     notCopyable(const notCopyable&);
-    notCopyable operator=(const notCopyable&);
+    notCopyable& operator=(const notCopyable&);
 
 };
 
