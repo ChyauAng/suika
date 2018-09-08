@@ -15,8 +15,8 @@ LDFLAGS :=
 DEFINES :=
 INCLUDE := -I .  
 
-CFLAGS := -g -Wall -o3 $(DEFINES) $(INCLUDE)
-CXXFLAGS := $(CFLAGS) -std=c++11 -pthread
+CFLAGS := -g -o3 $(DEFINES) $(INCLUDE)
+CXXFLAGS := $(CFLAGS) -std=c++11 -pthread -DNDEBUG
 
 .PHONY : all clean rebuild
 

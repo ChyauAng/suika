@@ -1,5 +1,5 @@
-#ifndef _TCPSERVER_H_
-#define _TCPSERVER_H_
+#ifndef TCPSERVER_H
+#define TCPSERVER_H
 
 #include "Atomic.h"
 #include "TcpConnection.h"

@@ -1,7 +1,6 @@
-#include"config.h"
+#ifndef _NOT_COPYABLE_H_
+#define _NOT_COPYABLE_H_
 
-#ifndef _NOT_COPYABLE_H
-#define _NOT_COPYABLE_H
 class notCopyable{
 protected:
     notCopyable(){};
@@ -9,8 +8,7 @@ protected:
 
 private:
     notCopyable(const notCopyable&);
-    notCopyable operator=(const notCopyable&);
-
+    notCopyable& operator=(const notCopyable&);
 };
 
 #endif

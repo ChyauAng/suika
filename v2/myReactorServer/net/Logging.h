@@ -1,5 +1,5 @@
-#ifndef _LOGGING_H_
-#define _LOGGING_H_
+#ifndef LOGGING_H
+#define LOGGING_H
 
 #include "LogStream.h"
 #include "Timestamp.h"

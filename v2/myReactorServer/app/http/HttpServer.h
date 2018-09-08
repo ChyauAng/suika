@@ -2,7 +2,6 @@
 #define HTTPSERVER_H
 
 #include "../../net/TcpServer.h"
-#include "../../net/notCopyable.h"
 
 #include <memory>
 
@@ -38,6 +37,9 @@ private:
     void onConnection(const TcpConnectionPtr& conn);
     void onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp receiveTime);
     void onRequest(const TcpConnectionPtr&, const HttpRequest&);
+
+    HttpServer(const HttpServer&);
+    HttpServer& operator=(const HttpServer&);
 
 };
 

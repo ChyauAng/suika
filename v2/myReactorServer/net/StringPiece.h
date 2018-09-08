@@ -37,8 +37,8 @@
 //
 // Arghh!  I wish C++ literals were automatically of type "string".
 
-#ifndef _STRINGPIECE_H_
-#define _STRINGPIECE_H_
+#ifndef STRINGPIECE_H
+#define STRINGPIECE_H
 
 #include <string.h>
 #include <iosfwd>    // for ostream forward-declaration
