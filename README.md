@@ -13,17 +13,13 @@
 ## [测试方法](https://github.com/linyacool/WebServer/blob/master/%E6%B5%8B%E8%AF%95%E5%8F%8A%E6%94%B9%E8%BF%9B.md)
 
 
-## 测试结果及分析
+## 测试结果
 测试截图放在最后  
 
 | 服务器 | 短连接QPS | 长连接QPS | 
 | - | :-: | -: | 
 | myReactorServer | 48845| 153570 | 
 | Muduo | 46374 | 118139 | 
-
-* analysis 1 
-* analysis 2
-* analysis 3
 
 
 ## 测试结果截图
@@ -35,6 +31,3 @@
 ![keepMyServer](https://github.com/ChyauAng/myReactor/blob/master/resources/myServerK.png)
 * muduo长连接测试  
 ![keepMuduo](https://github.com/ChyauAng/myReactor/blob/master/resources/muduoK.png)
-* myReactorServer空闲负载  
-* myReactorServer短连接CPU负载  
-* myReactorServer长连接CPU负载  
