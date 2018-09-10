@@ -13,7 +13,7 @@ DEFINES :=
 INCLUDE := -I .
 
 CFLAGS := -g -o3 $(DEFINES) $(INCLUDE)
-CXXFLAGS := $(CFLAGS) -std=c++11 -pthread
+CXXFLAGS := $(CFLAGS) -std=c++11 -pthread -DNDEBUG
 
 .PHONY : all clean rebuild
 
