@@ -12,14 +12,13 @@ class EventLoop;
 class Channel: public notCopyable{
 public:
     typedef std::function<void()> EventCallback;
-    typedef std::function<void(Timestamp)> ReadEventCallback;
     
     Channel(EventLoop* loop, int fd);
     ~Channel();
 
-    void handleEvent(Timestamp t);
+    void handleEvent();
 
-    void setReadCallback(ReadEventCallback&& cb){
+    void setReadCallback(EventCallback&& cb){
         readCallback_ = std::move(cb);
     }
     void setWriteCallback(EventCallback&& cb){
@@ -98,11 +97,20 @@ public:
         return events_ & kWriteEvent;
     }
 
+    void setHolder(std::shared_ptr<TcpContext> holder){
+        holder_ = holder;
+    }
+
+    std::shared_ptr<TcpContext> getHolder(){
+        std::shared_ptr<TcpContext> holder(holder_.lock());
+        return holder;
+    }
+
 
 private:
     void update();
 
-    void handleEventWithGuard(Timestamp t);
+    void handleEventWithGuard();
     
     static const int kNoneEvent;
     static const int kReadEvent;
@@ -126,6 +134,8 @@ private:
     EventCallback closeCallback_;
 
     std::weak_ptr<void> tie_;
+    // 解决从连接池取出连接后将栈上连接实体(TcpContext)置于哪里的问题
+    std::weak_ptr<TcpContext> holder_;
 };
 
 

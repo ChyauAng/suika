@@ -7,15 +7,6 @@
 #include "Channel.h"
 #include "EPollPoller.h"
 
-/*
-assert(EPOLLIN == POLLIN);
-assert(EPOLLPRI == POLLPRI);
-assert(EPOLLOUT == POLLOUT);
-assert(EPOLLRDHUP == POLLRDHUP);
-assert(EPOLLERR == POLLERR);
-assert(EPOLLHUP == POLLHUP);
-*/
-
 // for Channel, default index is -1
 const int kNew = -1;
 const int kAdded = 1;
@@ -35,11 +26,11 @@ EPollPoller::~EPollPoller(){
     close(epollfd_);
 }
 
-Timestamp EPollPoller::poll(int timeoutMs, ChannelList* activeChannels){
+void EPollPoller::poll(int timeoutMs, ChannelList* activeChannels){
     // LOG_TRACE << "fd total count " << channels_size();
     int numEvents = epoll_wait(epollfd_, &*events_.begin(), static_cast<int>(events_.size()), timeoutMs);
     int savedErrno = errno;
-    Timestamp now(Timestamp::now());
+    // Timestamp now(Timestamp::now());
     if(numEvents > 0){
         // LOG_TRACE << numEvents << " events happened";
         fillActiveChannels(numEvents, activeChannels);

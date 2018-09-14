@@ -11,13 +11,13 @@
 #include "base/CurrentThread.h"
 #include "base/Mutex.h"
 #include "base/notCopyable.h"
-#include "base/TimerId.h"
-#include "base/TimerQueue.h"
+#include "TimerQueue.h"
 #include "base/Timestamp.h"
 
  
-class EPollPoller;
 class Channel;
+class EPollPoller;
+class TcpContext;
 
 class EventLoop : public notCopyable{
 public:
@@ -53,13 +53,28 @@ public:
     // internal usage
     void wakeup();
 
-    void updateChannel(Channel* channel);
-    void removeChannel(Channel* channel);
+    void updateChannel(std::shared_ptr<Channel> channel);
+    void removeChannel(std::shared_ptr<Channel> channel);
+    
+    // 涉及构造与数据拷贝，需要改进
+    // 考虑使用一种容器，可插入／获取删除(std::list貌似不支持，考虑自己实现list)
+    TcpContext getFreeContext(){
+        TcpContext tc(tcpContext_.at(freeConnectionIndex_));
+        tcpContext_.erase(freeConnectionIndex_);
+        return tc;
+    }
+
+    void givebackContext(TcpContext tc){
+        tcpContext_.insert(freeConnectionIndex_);
+        // STL标准：插入将插入至位置之前，所以索引值刚好指在归还的连接实体上
+        // freeConnectionIndex_ -= 1;
+    }
+
 
 
 private:
     // Channel in interest
-    typedef std::vector<Channel*> ChannelList;
+    typedef std::vector<std::shared_ptr<Channel>> ChannelList;
 
     void abortNotInLoopThread();
     // eventfd, wakeup()
@@ -77,8 +92,8 @@ private:
     // wakeup fd:wakeup(), handleRead()
     int wakeupFd_;
     const pid_t threadId_;
+    int freeConnectionIndex_;
     
-    Timestamp pollReturnTime_;
     Channel* currentActiveChannel_;
     // small functors optimization
     const std::unique_ptr<EPollPoller> poller_;
@@ -87,6 +102,10 @@ private:
     const std::unique_ptr<Channel> wakeupChannel_;
     // doPendingFunctors
     std::vector<Functor> pendingFunctors_;
+    
+    // 连接池
+    std::vector<TcpContext> tcpContext_;
+
     ChannelList activeChannels_;
 
     MutexLock mutex_;

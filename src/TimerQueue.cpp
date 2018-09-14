@@ -6,7 +6,6 @@
 
 #include "EventLoop.h"
 #include "base/Timer.h"
-#include "base/TimerId.h"
 #include "base/TimerQueue.h"
 
 int createTimerfd();

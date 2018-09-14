@@ -5,8 +5,7 @@
 #include <vector>
 
 #include "EventLoop.h"
-#include "net/notCopyable.h"
-#include "net/Timestamp.h"
+#include "base/notCopyable.h"
 
 class Channel;
 
@@ -17,7 +16,7 @@ public:
     EPollPoller(EventLoop* loop);
     ~EPollPoller();
 
-    Timestamp poll(int timeoutMs, ChannelList* activeChannels);
+    void poll(int timeoutMs, ChannelList* activeChannels);
     void updateChannel(Channel* channel);
     void removeChannel(Channel* channel);
     
