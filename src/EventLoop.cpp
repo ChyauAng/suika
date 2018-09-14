@@ -5,11 +5,14 @@
 #include "Channel.h"
 #include "EPollPoller.h"
 #include "EventLoop.h"
+#include "TcpContext.h"
 
 using namespace std;
 
 __thread EventLoop* t_loopInThisThread = 0;
+
 const int kPollTimeMs = 10000;
+const int MaxConnctionPoolSize = 256;
 
 int createEventfd();
 
@@ -22,10 +25,12 @@ EventLoop::EventLoop()
     callingPendingFunctors_(false),
     wakeupFd_(createEventfd()),
     threadId_(CurrentThread::tid()),
+    freeConnectionIndex_(0),
     currentActiveChannel_(NULL),
     poller_(new EPollPoller(this)),
     timerQueue_(new TimerQueue(this)),
-    wakeupChannel_(new Channel(this, wakeupFd_)){
+    wakeupChannel_(new Channel(this, wakeupFd_)),
+    tcpContext_(new std::vector<TcpContext>(MaxConnectionPoolSize)){
     // do some logging things
     // LOG_DEBUG
     if(t_loopInThisThread){
@@ -58,12 +63,12 @@ void EventLoop::loop(){
     // quit_ = false;
     while(!quit_){
         activeChannels_.clear();
-        pollReturnTime_ = poller_->poll(kPollTimeMs, &activeChannels_);
+        poller_->poll(kPollTimeMs, &activeChannels_);
 
         eventHandling_ = true;
         for(ChannelList::iterator it = activeChannels_.begin(); it != activeChannels_.end(); ++it){
-            currentActiveChannel_ = *it;
-            currentActiveChannel_->handleEvent(pollReturnTime_);
+            currentActiveChannel_ = (*it).get();
+            currentActiveChannel_->handleEvent();
         }
         currentActiveChannel_ = NULL;
         eventHandling_ = false;

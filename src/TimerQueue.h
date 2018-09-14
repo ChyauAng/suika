@@ -12,7 +12,6 @@
 
 class EventLoop;
 class Timer;
-class TimerId;
 
 class TimerQueue: public notCopyable{
 public:
@@ -63,4 +62,25 @@ private:
 };
 
 
+class TimerId{
+public:
+    TimerId()
+        :sequence_(0),
+        timer_(NULL){
+        
+    }
+
+    TimerId(Timer* timer, int seq)
+        :sequence_(seq),
+        timer_(timer){
+   
+    }
+
+    friend class TimerQueue;
+
+private:
+    int sequence_;
+
+    Timer* timer_;
+};
 #endif
