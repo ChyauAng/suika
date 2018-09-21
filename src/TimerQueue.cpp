@@ -6,7 +6,7 @@
 
 #include "EventLoop.h"
 #include "base/Timer.h"
-#include "base/TimerQueue.h"
+#include "TimerQueue.h"
 
 int createTimerfd();
 
@@ -22,16 +22,16 @@ TimerQueue::TimerQueue(EventLoop* loop)
     timerfd_(createTimerfd()),
     loop_(loop),
     timers_(),
-    timerfdChannel_(loop, timerfd_){
+    timerfdChannel_(new Channel(loop, timerfd_)){
 
-    timerfdChannel_.setReadCallback(std::bind(&TimerQueue::handleRead, this));
-    timerfdChannel_.enableReading();
+    timerfdChannel_->setReadCallback(std::bind(&TimerQueue::handleRead, this));
+    timerfdChannel_->enableReading();
 }
 
 
 TimerQueue::~TimerQueue(){
-    timerfdChannel_.disableAll();
-    timerfdChannel_.remove();
+    timerfdChannel_->disableAll();
+    timerfdChannel_->remove();
     close(timerfd_);
 
     for(TimerList::iterator it = timers_.begin(); it != timers_.end(); ++it){
@@ -103,6 +103,7 @@ void TimerQueue::reset(const std::vector<Entry>& expired, Timestamp now){
 
 void TimerQueue::handleRead(){
     loop_->assertInLoopThread();
+    // printf("The timer fd is %d\n", timerfd_);
     Timestamp now(Timestamp::now());
     readTimerfd(timerfd_, now);
 

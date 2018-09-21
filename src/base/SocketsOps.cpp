@@ -80,6 +80,53 @@ int createNonblockingOrDie(sa_family_t family){
     return sockfd;
 }
 
+int socketBindListen(int port){
+    if(port < 0 || port > 65535){
+        return -1;
+    }
+
+    int listenFd = 0;
+    if((listenFd = ::socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0)) == -1){
+        return -1;
+    }
+
+    struct sockaddr_in server_addr;
+    bzero((char*)&server_addr, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    server_addr.sin_port = htons((unsigned short)port);
+
+    if(::bind(listenFd, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1){
+        return -1;
+    }
+
+    if(::listen(listenFd, 2048) == -1){
+        return -1;
+    }
+
+    if(listenFd == -1){
+        close(listenFd);
+        return -1;
+    }
+
+    return listenFd;
+}
+
+int setSocketNonBlocking(int fd){
+    int flag = fcntl(fd, F_GETFL, 0);
+    if(flag == -1){
+        return -1;
+    }
+
+    flag |= O_NONBLOCK;
+
+    if(fcntl(fd, F_SETFL, flag) == -1){
+        return -1;
+    }
+    return 0;
+}
+
+
 int connect(int sockfd, const struct sockaddr* addr){
     return ::connect(sockfd, addr, static_cast<socklen_t>(sizeof(struct sockaddr_in6)));
 }

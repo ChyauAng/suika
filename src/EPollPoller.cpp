@@ -48,14 +48,14 @@ void EPollPoller::poll(int timeoutMs, ChannelList* activeChannels){
             // LOG_SYSERR << "EPollPoller::poll()";
         }
     }
-    return now;
 }
 
 void EPollPoller::fillActiveChannels(int numEvents, ChannelList* activeChannels) const{
     assert(static_cast<size_t>(numEvents) <= events_.size());
     for(int i = 0; i < numEvents; i++){
-        Channel* channel = static_cast<Channel*>(events_[i].data.ptr);
+        Channel* channel= static_cast<Channel*>(events_[i].data.ptr);
         int fd = channel->fd();
+        // printf("The found fd in fillActiveChannels is %d\n", fd);
         ChannelMap::const_iterator it = channels_.find(fd);
         assert(it != channels_.end());
         assert(it->second == channel);
@@ -101,6 +101,7 @@ void EPollPoller::updateChannel(Channel* channel){
 void EPollPoller::removeChannel(Channel* channel){
     assertInLoopThread();
     int fd = channel->fd();
+    // printf("The remove channel fd is %lld\n", fd);
 
     // LOG_TRACE << "fd = " << fd;
     assert(channels_.find(fd) != channels_.end());

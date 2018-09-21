@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "StringPiece.h"
+
 // #include "StringPiece.h"
 
 class Buffer{
@@ -82,14 +84,15 @@ public:
         retrieve(length);
     }
     
-    void append(const void* data, size_t len){
-        ensureWritableBytes(len);
-        memcpy(beginWrite(), data, len);
-        hasWritten(len);
+    void append(const StringPiece& str){
+        append(str.data(), str.size());
     }
 
     void append(const char* data, size_t len){
-        append(static_cast<const void*>(data), len);
+        // printf("The append content is %s\n", data);
+        ensureWritableBytes(len);
+        strncpy(beginWrite(), data, len);
+        hasWritten(len);
     }
 
     /*
@@ -122,13 +125,16 @@ public:
         return buf_;
     
     }
+    char* getBuf(){
+        return buf_;
+    }
 
     const size_t getLen()const{
         return len_;
     }
 
     ssize_t readFd(int fd, int* savedErrno);
-    
+
 private:
     
     void makeSpace(size_t len){

@@ -5,10 +5,6 @@
 #include "notCopyable.h"
 #include <pthread.h>
 
-#define MCHECK(ret) ({ __typeof__ (ret) errnum = (ret);         \
-            if (__builtin_expect(errnum != 0, 0))    \
-    __assert_perror_fail (errnum, __FILE__, __LINE__, __func__);})
-
 
 class Condition: public notCopyable{
 public:
@@ -23,7 +19,7 @@ public:
 
     void wait(){
         MutexLock::UnassignGuard ug(mutex_);
-        MCHECK(pthread_cond_wait(&pcond_, mutex_.getMutex()));
+        pthread_cond_wait(&pcond_, mutex_.getMutex());
     }
 
     bool waitForSeconds(double seconds);

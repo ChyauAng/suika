@@ -7,6 +7,10 @@ namespace sockets{
     
 int createNonblockingOrDie(sa_family_t family);
 
+int socketBindListen(int port);
+
+int setSocketNonBlocking(int fd);
+
 int connect(int sockfd, const struct sockaddr* addr);
 
 void bindOrDie(int sockfd, const struct sockaddr* addr);
