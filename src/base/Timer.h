@@ -1,6 +1,6 @@
 #ifndef _TIMER_H_
-#define _TIMER_H
-_
+#define _TIMER_H_
+
 #include "Callbacks.h"
 #include "notCopyable.h"
 #include "Timestamp.h"

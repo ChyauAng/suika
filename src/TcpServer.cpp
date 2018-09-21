@@ -1,22 +1,26 @@
 #include <netinet/in.h>
 
 #include "Channel.h"
-#include "EventLoopThread.h"
+#include "EventLoop.h"
+#include "EventLoopThreadPool.h"
+#include "HttpData.h"
 #include "base/SocketsOps.h"
 #include "TcpContext.h"
 #include "TcpServer.h"
 
-TcpServer::TcpServer(EventLoop* loop, int ThreadNum, int port)
+TcpServer::TcpServer(EventLoop* loop, int threadNum, int port)
     :threadNum_(threadNum),
     port_(port),
-    listenFd_(socketBindListen(port)) //SocketsOps.h
+    listenFd_(sockets::socketBindListen(port)), //SocketsOps.h
     loop_(loop),
     acceptChannel_(new Channel(loop, listenFd_)),
-    threadPool_(new EventLoopTHreadPool(loop)){
-        if(setSocketNonBlocking(listenFd_) < 0){  // SocketsOps.h
+    threadPool_(new EventLoopThreadPool(loop)){
+        /*
+        if(sockets::setSocketNonBlocking(listenFd_) < 0){  // SocketsOps.h
             perror("set socket fd nonblocking failed.");
             abort();
         }
+        */
     }
 
 TcpServer::~TcpServer(){
@@ -24,11 +28,13 @@ TcpServer::~TcpServer(){
 }
 
 void TcpServer::start(){
+    threadPool_->setThreadNum(threadNum_);
     threadPool_->start();
     // ET模式的话需要在Channel的事件中更改(KReadEvent与KWriteEvent)
     acceptChannel_->enableReading();
-    acceptChannel_->setReadCallback(std::bind(&Server::handleNewConn, this));
+    acceptChannel_->setReadCallback(std::bind(&TcpServer::handleNewConn, this));
     loop_->updateChannel(acceptChannel_);
+    // printf("The listen fd is %d\n", listenFd_);
 }
 
 void TcpServer::handleNewConn(){
@@ -38,8 +44,9 @@ void TcpServer::handleNewConn(){
     int connfd = 0;
     while((connfd = sockets::accept(listenFd_, &addr)) > 0){
         EventLoop* ioLoop = threadPool_->getNextLoop();
+        // printf("The conn fd is %d\n", connfd);
 
-        if(setSocketNonBlocking(connfd) < 0){
+        if(sockets::setSocketNonBlocking(connfd) < 0){
             return;
         }
 
@@ -47,14 +54,27 @@ void TcpServer::handleNewConn(){
         sockets::setReuseAddr(connfd, true);
         sockets::setReusePort(connfd, true);
         
+        // !!!!!!!!重点测试对象
+
+        // std::shared_ptr<HttpData> hd(new HttpData());
         // ioLoop获得空闲TcpContext
-        TcpContext tcpConetxt(ioLoop->getFreeContext());
-        tcpContext->setState(KConnected);
+        std::shared_ptr<TcpContext> tcpContext(ioLoop->getFreeContext());
+        // printf("tcpContext in TcpServer use count 1 is %d\n", tcpContext.use_count());
+        // tcpContext->setTDataNull();
+        // tcpContext->setHData(hd);
+        // hd->setHolder(tcpContext);
+        // printf("tcpContext in TcpServer use count 2 is %d\n", tcpContext.use_count());
+
+
+        tcpContext->setStateKConnected();
         // 将connfd传入TcpContext，生成Channel，通过ioLoop->updateChannel注册到ioLoop的poller_中
         // 通过调用TcpContext中某函数ioLoop->queueInLoop(&TcpContext::newEvent, this),(X) 不需要，直接将事件绑定至Channel即可
         tcpContext->setChannel(connfd);
-        tcpContext->getChannel()->setHolder(tcpContext);
-        ioLoop->updateChannel(tcpContext->getChannel());
+        // printf("tcpContext in TcpServer use count 3 is %d\n", tcpContext.use_count());
+        // tcpContext->getChannel()->setHolder(tcpContext);
+        // ioLoop->updateChannel(tcpContext->getChannel());
+        ioLoop->queueInLoop(std::bind(&TcpContext::configEvent, tcpContext));
+        // printf("tcpContext in TcpServer use count 4 is %d\n", tcpContext.use_count());
         
         // tcpConetxt->addInLoop();
 

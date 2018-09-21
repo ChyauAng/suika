@@ -6,6 +6,7 @@
 
 #include "base/notCopyable.h"
 #include "base/Timestamp.h"
+#include "TcpContext.h"
 
 class EventLoop;
 
@@ -19,21 +20,21 @@ public:
     void handleEvent();
 
     void setReadCallback(EventCallback&& cb){
-        readCallback_ = std::move(cb);
+        readCallback_ = cb;
     }
     void setWriteCallback(EventCallback&& cb){
-        writeCallback_ = std::move(cb);
+        writeCallback_ = cb;
     }
     void setErrorCallback(EventCallback&& cb){
-        errorCallback_ = std::move(cb);
+        errorCallback_ = cb;
     }
 
     void setCloseCallback(EventCallback&& cb){
-        closeCallback_ = std::move(cb);
+        closeCallback_ = cb;
     }
     
     // avoid the owner object being destoryed during handleEvent
-    void tie(const std::shared_ptr<void>&);
+    // void tie(const std::shared_ptr<void>&);
 
     int fd() const{
         return fd_;
@@ -106,6 +107,14 @@ public:
         return holder;
     }
 
+    void setFd(int fd){
+        fd_ = fd;
+    }
+
+    void setLoop(EventLoop* loop){
+        loop_ = loop;
+    }
+
 
 private:
     void update();
@@ -116,11 +125,11 @@ private:
     static const int kReadEvent;
     static const int kWriteEvent;
     
-    bool tied_;
+    // bool tied_;
     bool eventHandling_;
     bool addedToLoop_;
 
-    const int fd_;
+    int fd_;
     int events_;
     int revents_;
     // used by Poller
@@ -128,12 +137,12 @@ private:
 
     EventLoop* loop_;
 
-    ReadEventCallback readCallback_;
+    EventCallback readCallback_;
     EventCallback writeCallback_;
     EventCallback errorCallback_;
     EventCallback closeCallback_;
 
-    std::weak_ptr<void> tie_;
+    // std::weak_ptr<void> tie_;
     // 解决从连接池取出连接后将栈上连接实体(TcpContext)置于哪里的问题
     std::weak_ptr<TcpContext> holder_;
 };

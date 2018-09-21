@@ -51,6 +51,8 @@ void EventLoopThread::threadFunc(){
         cond_.notify();
     }
 
+    loop.initContextPool();
+    // printf("Context poll init completed\n");
     loop.loop();
 
     loop_ = NULL;

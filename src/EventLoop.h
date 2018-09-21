@@ -11,19 +11,21 @@
 #include "base/CurrentThread.h"
 #include "base/Mutex.h"
 #include "base/notCopyable.h"
+#include "TcpContext.h"
 #include "TimerQueue.h"
 #include "base/Timestamp.h"
 
  
 class Channel;
 class EPollPoller;
-class TcpContext;
 
 class EventLoop : public notCopyable{
 public:
     typedef std::function<void()> Functor;
     EventLoop();
     ~EventLoop();
+
+    void initContextPool();
 
     void loop();
 
@@ -53,28 +55,36 @@ public:
     // internal usage
     void wakeup();
 
-    void updateChannel(std::shared_ptr<Channel> channel);
-    void removeChannel(std::shared_ptr<Channel> channel);
+    void updateChannel(Channel* channel);
+    void removeChannel(Channel* channel);
     
     // 涉及构造与数据拷贝，需要改进
     // 考虑使用一种容器，可插入／获取删除(std::list貌似不支持，考虑自己实现list)
-    TcpContext getFreeContext(){
-        TcpContext tc(tcpContext_.at(freeConnectionIndex_));
-        tcpContext_.erase(freeConnectionIndex_);
+    std::shared_ptr<TcpContext> getFreeContext(){
+        std::shared_ptr<TcpContext> tc(freeContext_->getTData());
+        freeContext_->setTData(tc->getTData());
+        tc->setTDataNull();
+        activeContexts_.push_back(tc);
+        printf("1 use count is %d\n", tc.use_count());
         return tc;
     }
 
-    void givebackContext(TcpContext tc){
-        tcpContext_.insert(freeConnectionIndex_);
-        // STL标准：插入将插入至位置之前，所以索引值刚好指在归还的连接实体上
-        // freeConnectionIndex_ -= 1;
+    void givebackContext(std::shared_ptr<TcpContext> stc){
+        printf("2 use count is %d\n", stc.use_count());
+        // stc->setHDataNull();
+        stc->setTData(freeContext_->getTData());
+        freeContext_->setTData(stc);
+        TcpContextList::iterator i = std::find(activeContexts_.begin(), activeContexts_.end(), stc);
+        assert(i != activeContexts_.end());
+        activeContexts_.erase(i);
+        printf("3 use count is %d\n", stc.use_count());
     }
-
 
 
 private:
     // Channel in interest
-    typedef std::vector<std::shared_ptr<Channel>> ChannelList;
+    typedef std::vector<Channel*> ChannelList;
+    typedef std::vector<std::shared_ptr<TcpContext>> TcpContextList;
 
     void abortNotInLoopThread();
     // eventfd, wakeup()
@@ -92,23 +102,30 @@ private:
     // wakeup fd:wakeup(), handleRead()
     int wakeupFd_;
     const pid_t threadId_;
-    int freeConnectionIndex_;
-    
+
+    Channel* wakeupChannel_;
     Channel* currentActiveChannel_;
+    
     // small functors optimization
     const std::unique_ptr<EPollPoller> poller_;
     const std::unique_ptr<TimerQueue> timerQueue_;
     // wakeupFd
-    const std::unique_ptr<Channel> wakeupChannel_;
+
+    // 空闲链表头
+    // std::shared_ptr<TcpContext> tcpContext_;
+    // 指向空闲TcpContext前一个
+    std::shared_ptr<TcpContext> freeContext_;
+
     // doPendingFunctors
     std::vector<Functor> pendingFunctors_;
     
     // 连接池
-    std::vector<TcpContext> tcpContext_;
 
     ChannelList activeChannels_;
+    TcpContextList activeContexts_;
 
     MutexLock mutex_;
+
 };
 
 

@@ -1,6 +1,7 @@
 #ifndef _TIMERQUEUE_H_
 #define _TIMERQUEUE_H_
 
+#include <memory>
 #include <set>
 #include <sys/timerfd.h>
 #include <vector>
@@ -12,6 +13,7 @@
 
 class EventLoop;
 class Timer;
+class TimerId;
 
 class TimerQueue: public notCopyable{
 public:
@@ -49,6 +51,8 @@ private:
 
     EventLoop* loop_;
 
+    std::shared_ptr<Channel> timerfdChannel_;
+
     // timers sorted by expiration
     TimerList timers_;
     // for calcel()
@@ -57,7 +61,6 @@ private:
     // avoid self-unregister
     ActiveTimerSet cancelingTimers_;
 
-    Channel timerfdChannel_;
 
 };
 

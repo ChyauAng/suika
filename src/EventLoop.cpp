@@ -2,6 +2,8 @@
 #include <sys/eventfd.h>
 #include <unistd.h>
 
+#include <stdio.h>
+
 #include "Channel.h"
 #include "EPollPoller.h"
 #include "EventLoop.h"
@@ -12,7 +14,7 @@ using namespace std;
 __thread EventLoop* t_loopInThisThread = 0;
 
 const int kPollTimeMs = 10000;
-const int MaxConnctionPoolSize = 256;
+const int MaxConnectionPoolSize = 1024;
 
 int createEventfd();
 
@@ -25,12 +27,12 @@ EventLoop::EventLoop()
     callingPendingFunctors_(false),
     wakeupFd_(createEventfd()),
     threadId_(CurrentThread::tid()),
-    freeConnectionIndex_(0),
+    wakeupChannel_(new Channel(this, wakeupFd_)),
     currentActiveChannel_(NULL),
     poller_(new EPollPoller(this)),
     timerQueue_(new TimerQueue(this)),
-    wakeupChannel_(new Channel(this, wakeupFd_)),
-    tcpContext_(new std::vector<TcpContext>(MaxConnectionPoolSize)){
+    // tcpContext_(NULL),
+    freeContext_(NULL){
     // do some logging things
     // LOG_DEBUG
     if(t_loopInThisThread){
@@ -44,16 +46,32 @@ EventLoop::EventLoop()
     // wake up the possibly blocked IO thread
     wakeupChannel_->setReadCallback(std::bind(&EventLoop::handleRead, this));
     wakeupChannel_->enableReading();
+    // printf("The wakeup fd is %d\n", wakeupFd_);
+   
+   //  initContextPool();
+
 }
 
 EventLoop::~EventLoop(){
     assert(!looping_);
+    // printf("I am here in EventLoop::~EventLoop()\n");
 
     wakeupChannel_->disableAll();
     wakeupChannel_->remove();
     ::close(wakeupFd_);
 
     t_loopInThisThread = NULL;
+}
+
+void EventLoop::initContextPool(){
+    freeContext_ = std::shared_ptr<TcpContext>(new TcpContext(this));
+    std::shared_ptr<TcpContext> tc(freeContext_);
+    for(int i = 0; i < MaxConnectionPoolSize; i++){
+        std::shared_ptr<TcpContext> tct(new TcpContext(this));
+        tc->setTData(tct);
+        tc = tc->getTData();
+    }
+    // freeContext_ = tcpContext_;
 }
 
 void EventLoop::loop(){
@@ -67,10 +85,10 @@ void EventLoop::loop(){
 
         eventHandling_ = true;
         for(ChannelList::iterator it = activeChannels_.begin(); it != activeChannels_.end(); ++it){
-            currentActiveChannel_ = (*it).get();
+            currentActiveChannel_ = (*it);
             currentActiveChannel_->handleEvent();
         }
-        currentActiveChannel_ = NULL;
+        currentActiveChannel_= NULL;
         eventHandling_ = false;
         doPendingFunctors();
     }
@@ -117,6 +135,7 @@ void EventLoop::queueInLoop(Functor&& cb){
     }
 
     if(!isInLoopThread() || callingPendingFunctors_){
+        // printf("I am here in EventLoop::queueInLoop() before wakeup()\n");
         wakeup();
     }
 }
@@ -125,6 +144,7 @@ void EventLoop::queueInLoop(Functor&& cb){
 void EventLoop::wakeup(){
     uint64_t one = 1;
     ssize_t n = ::write(wakeupFd_, &one, sizeof(one));
+    assert(n == one);
     if(n != sizeof one){
         // LOG_ERROR;
     }

@@ -22,11 +22,11 @@ public:
 private:
     int threadNum_;
     int port_;
-    int listeningFd_;
+    int listenFd_;
 
     EventLoop* loop_;
 
-    std::shared_ptr<Channel> acceptChannel_;
+    Channel* acceptChannel_;
     const std::unique_ptr<EventLoopThreadPool> threadPool_;
 
 

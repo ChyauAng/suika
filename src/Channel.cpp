@@ -9,8 +9,8 @@ const int Channel::kReadEvent = EPOLLIN | EPOLLPRI;
 const int Channel::kWriteEvent = EPOLLOUT;
 
 Channel::Channel(EventLoop* loop, int fd)
-    :tied_(false), 
-    eventHandling_(false){
+    // :tied_(false), 
+    :eventHandling_(false),
     addedToLoop_(false),
     fd_(fd),
     events_(0),
@@ -36,6 +36,7 @@ void Channel::remove(){
 }
 
 void Channel::handleEvent(){
+    /*
     std::shared_ptr<void> guard;
     if(tied_){
         // weak_ptr --> shared_ptr
@@ -47,6 +48,8 @@ void Channel::handleEvent(){
     else{
         handleEventWithGuard();
     }
+    */
+    handleEventWithGuard();
 }
 
 void Channel::handleEventWithGuard(){
@@ -58,11 +61,7 @@ void Channel::handleEventWithGuard(){
         }
     }
 
-    if(revents_ & EPOLLNVAL){
-        // LOG_WARN
-    }
-
-    if(revents_ & (EPOLLERR | EPOLLNVAL)){
+    if(revents_ & (EPOLLERR)){
         if(errorCallback_){
             errorCallback_();
         }
@@ -70,20 +69,25 @@ void Channel::handleEventWithGuard(){
 
     if(revents_ & (EPOLLIN | EPOLLPRI | EPOLLRDHUP)){
         if(readCallback_){
+            printf("read channel fd is %d\n", fd_);
+            printf("read holder use count is%d\n", holder_.use_count());
             readCallback_();
         }
     }
 
     if(revents_ & (EPOLLOUT)){
         if(writeCallback_){
+            // printf("write channel fd is %d\n", fd_);
+            // printf("write holder use count is%d\n", holder_.use_count());
             writeCallback_();
         }
     }
     eventHandling_ = false;
 }
-
+/*
 void Channel::tie(const std::shared_ptr<void>& obj){
     tie_ = obj;
     tied_ = true;
 }
+*/
 

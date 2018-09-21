@@ -51,6 +51,7 @@ EventLoop* EventLoopThreadPool::getNextLoop(){
         if(implicit_cast<size_t>(next_) >= loops_.size()){
             next_ = 0;
         }
+        // printf("The next loop index is %d\n", next_);
     }
     return loop;
 }
