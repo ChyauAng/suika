@@ -69,8 +69,11 @@ void Channel::handleEventWithGuard(){
 
     if(revents_ & (EPOLLIN | EPOLLPRI | EPOLLRDHUP)){
         if(readCallback_){
-            printf("read channel fd is %d\n", fd_);
-            printf("read holder use count is%d\n", holder_.use_count());
+            // printf("read channel fd is %d\n", fd_);
+            // printf("read holder use count is%d\n", holder_.use_count());
+            // printf("The current read tid is %d\n", CurrentThread::tid());
+            // printf("********************\n");
+
             readCallback_();
         }
     }
@@ -79,6 +82,7 @@ void Channel::handleEventWithGuard(){
         if(writeCallback_){
             // printf("write channel fd is %d\n", fd_);
             // printf("write holder use count is%d\n", holder_.use_count());
+            // printf("The current write id is %d\n", CurrentThread::tid());
             writeCallback_();
         }
     }

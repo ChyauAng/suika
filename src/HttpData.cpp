@@ -164,12 +164,11 @@ void HttpData::onRequest(Buffer* input){
         setCloseConnection(true);
     }
     
-    Buffer buf;
-    appendToBuffer(&buf);
+    appendToBuffer(&buf_);
     // buf.print();
 
     // 在激活写事件时，先写入部分数据，然后再handleWrite()
-    holder->send(&buf);
+    holder->send(&buf_);
 
     // shutdown write
     if(close){
@@ -177,6 +176,7 @@ void HttpData::onRequest(Buffer* input){
     }
     
     input->retrieveAll();
+    buf_.retrieveAll();
     clearAllContent();
 
 }

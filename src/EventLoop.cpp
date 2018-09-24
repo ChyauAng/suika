@@ -14,7 +14,7 @@ using namespace std;
 __thread EventLoop* t_loopInThisThread = 0;
 
 const int kPollTimeMs = 10000;
-const int MaxConnectionPoolSize = 1024;
+const int MaxConnectionPoolSize = 512;
 
 int createEventfd();
 
@@ -68,10 +68,17 @@ void EventLoop::initContextPool(){
     std::shared_ptr<TcpContext> tc(freeContext_);
     for(int i = 0; i < MaxConnectionPoolSize; i++){
         std::shared_ptr<TcpContext> tct(new TcpContext(this));
+        tct->setIndex(i);
         tc->setTData(tct);
         tc = tc->getTData();
     }
-    // freeContext_ = tcpContext_;
+    /*
+    tc = freeContext_;
+    while(tc->getTData() != NULL){
+        printf("%d ", tc->getIndex());
+        tc = tc->getTData();
+    }
+    */
 }
 
 void EventLoop::loop(){
@@ -139,7 +146,27 @@ void EventLoop::queueInLoop(Functor&& cb){
         wakeup();
     }
 }
+/*
+void EventLoop::runInLoop(InitFunctor&& cb){
+    if(isInLoopThread()){
+        cb();
+    }
+    else{
+        queueInLoop(std::move(cb));
+    }
+}
 
+void EventLoop::queueInLoop(InitFunctor&& cb){
+    {
+        MutexLockGuard lock(mutex_);
+        pendingFunctors_.push_back(std::move(cb));
+    }
+
+    if(!isInLoopThread() || callingPendingFunctors_){
+        // printf("I am here in EventLoop::queueInLoop() before wakeup()\n");
+        wakeup();
+    }
+*/
 
 void EventLoop::wakeup(){
     uint64_t one = 1;

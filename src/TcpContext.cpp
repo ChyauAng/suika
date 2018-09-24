@@ -7,6 +7,7 @@
 
 TcpContext::TcpContext(EventLoop* loop)
     :state_(KConnecting),
+    index_(-1),
     loop_(loop),
     tdata_(NULL),
     hdata_(new HttpData()),
@@ -67,14 +68,16 @@ void TcpContext::sendInLoop(const char* data, size_t len){
 
     assert(nwrote >= 0);
     if(!faultError && remaining > 0){
+        // printf("TcpContext::sendInLoop() not write completely\n");
         outputBuffer_.append(static_cast<const char*>(data) + nwrote, remaining);
         if(!channel_->isWriting()){
             channel_->enableWriting();
         }
     }
     else if(!faultError && remaining == 0){
-        // printf("I am here in TcpContext::sendInLoop()\n");
+        // printf("TcpContext::sendInLoop() write completely\n");
         // loop_->givebackContext(shared_from_this());
+        // handleClose();
     }
 }
 
@@ -128,6 +131,7 @@ void TcpContext::shutdownInLoop(){
 void TcpContext::handleWrite(){
     loop_->assertInLoopThread();
     // printf("&&&&&the write channel fd is %d\n", channel_->fd());
+    // printf("The current TcpContext index is %d\n", index_);
     if(channel_->isWriting()){
         ssize_t n = ::write(channel_->fd(), outputBuffer_.peek(), outputBuffer_.readableBytes());
         if(n > 0){
@@ -153,15 +157,20 @@ void TcpContext::handleWrite(){
 void TcpContext::handleClose(){
     loop_->assertInLoopThread();
     // printf("I am here in TcpContext::handleClose()\n");
+    // printf("************************");
 
     assert(state_ == KConnected || state_ == KDisconnecting);
 
     setState(KDisconnected);
 
     channel_->disableAll();
+    ::close(channel_->fd());
+    channel_->setFd(-1);
 
-    loop_->removeChannel(channel_.get());
-    loop_->givebackContext(shared_from_this());
+    reset();
+
+    loop_->runInLoop(std::bind(&EventLoop::removeChannel, loop_, channel_.get()));
+    loop_->runInLoop(std::bind(&EventLoop::givebackContext, loop_, shared_from_this()));
     // printf("the use count after close is %d\n", shared_from_this().use_count() - 1);
 }
 
@@ -173,7 +182,5 @@ void TcpContext::handleError(){
 
 void TcpContext::setChannel(int connfd){
     channel_->setFd(connfd);
-    // channel_->setLoop(loop_);
     channel_->setHolder(shared_from_this());
-    // channel_->tie(shared_from_this());
 }

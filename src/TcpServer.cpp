@@ -58,7 +58,8 @@ void TcpServer::handleNewConn(){
 
         // std::shared_ptr<HttpData> hd(new HttpData());
         // ioLoop获得空闲TcpContext
-        std::shared_ptr<TcpContext> tcpContext(ioLoop->getFreeContext());
+        ioLoop->runInLoop(std::bind(&EventLoop::getFreeContext, ioLoop, connfd));
+        // std::shared_ptr<TcpContext> tcpContext(ioLoop->getFreeContext());
         // printf("tcpContext in TcpServer use count 1 is %d\n", tcpContext.use_count());
         // tcpContext->setTDataNull();
         // tcpContext->setHData(hd);
@@ -66,14 +67,14 @@ void TcpServer::handleNewConn(){
         // printf("tcpContext in TcpServer use count 2 is %d\n", tcpContext.use_count());
 
 
-        tcpContext->setStateKConnected();
+        // tcpContext->setStateKConnected();
         // 将connfd传入TcpContext，生成Channel，通过ioLoop->updateChannel注册到ioLoop的poller_中
         // 通过调用TcpContext中某函数ioLoop->queueInLoop(&TcpContext::newEvent, this),(X) 不需要，直接将事件绑定至Channel即可
-        tcpContext->setChannel(connfd);
+        // tcpContext->setChannel(connfd);
         // printf("tcpContext in TcpServer use count 3 is %d\n", tcpContext.use_count());
         // tcpContext->getChannel()->setHolder(tcpContext);
         // ioLoop->updateChannel(tcpContext->getChannel());
-        ioLoop->queueInLoop(std::bind(&TcpContext::configEvent, tcpContext));
+        // ioLoop->queueInLoop(std::bind(&TcpContext::configEvent, tcpContext));
         // printf("tcpContext in TcpServer use count 4 is %d\n", tcpContext.use_count());
         
         // tcpConetxt->addInLoop();
