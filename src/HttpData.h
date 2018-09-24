@@ -196,11 +196,13 @@ private:
     // HttpRequest, HttpContext, HttpResponse...
     std::weak_ptr<TcpContext> holder_;
 
+    Buffer buf_;
+    
     std::map<std::string, std::string> requestHeaders_;
     std::map<std::string, std::string> responseHeaders_;
 
     Timestamp receiveTime_;
-
+   
     static char favicon[555];
 
 };

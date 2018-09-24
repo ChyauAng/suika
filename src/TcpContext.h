@@ -65,6 +65,19 @@ public:
 
     void configEvent();
 
+    void setIndex(int index){
+        index_ = index;
+    }
+
+    int getIndex(){
+        return index_;
+    }
+
+    void reset(){
+        state_ = KConnecting;
+        inputBuffer_.retrieveAll();
+        outputBuffer_.retrieveAll();
+    }
 private:
     void sendInLoop(const char* message, size_t len);
 
@@ -76,6 +89,7 @@ private:
     // bool instance in Channel
     
     StateE state_;
+    int index_;
 
     EventLoop* loop_;
 

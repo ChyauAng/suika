@@ -111,10 +111,6 @@ public:
         fd_ = fd;
     }
 
-    void setLoop(EventLoop* loop){
-        loop_ = loop;
-    }
-
 
 private:
     void update();
