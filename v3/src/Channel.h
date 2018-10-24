@@ -28,47 +28,40 @@ public:
     void setErrorCallback(EventCallback&& cb){
         errorCallback_ = cb;
     }
-
     void setCloseCallback(EventCallback&& cb){
         closeCallback_ = cb;
     }
-    
-    // avoid the owner object being destoryed during handleEvent
-    // void tie(const std::shared_ptr<void>&);
 
     int fd() const{
         return fd_;
+    }
+    void setFd(int fd){
+        fd_ = fd;
     }
 
     int events() const{
         return events_;
     }
-
     void set_revents(int revt){
         revents_ = revt;
     }
-
     bool isNoneEvent() const{
         return events_ == kNoneEvent;
     }
-    
     void enableReading(){
         // 相应位变１
         events_ |= kReadEvent;
         update();
     }
-    
     void enableWriting(){
         events_ |= kWriteEvent;
         update();
     }
-
     void disableWriting(){
         // 相应位变０
         events_ &= ~kWriteEvent;
         update();
     }
-
     void disableAll(){
         events_ = kNoneEvent;
         update();
@@ -78,7 +71,6 @@ public:
     int index(){
         return index_;
     }
-
     void setIndex(int idx){
         index_ = idx;
     }
@@ -93,7 +85,6 @@ public:
     bool isReading() const{
         return events_ & kReadEvent;
     }
-
     bool isWriting() const{
         return events_ & kWriteEvent;
     }
@@ -101,16 +92,10 @@ public:
     void setHolder(std::shared_ptr<TcpContext> holder){
         holder_ = holder;
     }
-
     std::shared_ptr<TcpContext> getHolder(){
         std::shared_ptr<TcpContext> holder(holder_.lock());
         return holder;
     }
-
-    void setFd(int fd){
-        fd_ = fd;
-    }
-
 
 private:
     void update();
@@ -121,7 +106,6 @@ private:
     static const int kReadEvent;
     static const int kWriteEvent;
     
-    // bool tied_;
     bool eventHandling_;
     bool addedToLoop_;
 
@@ -138,7 +122,6 @@ private:
     EventCallback errorCallback_;
     EventCallback closeCallback_;
 
-    // std::weak_ptr<void> tie_;
     // 解决从连接池取出连接后将栈上连接实体(TcpContext)置于哪里的问题
     std::weak_ptr<TcpContext> holder_;
 };

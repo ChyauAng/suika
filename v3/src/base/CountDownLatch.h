@@ -20,5 +20,4 @@ private:
     mutable MutexLock mutex_;
     Condition condition_;
 };
-
 #endif

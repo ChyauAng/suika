@@ -89,17 +89,18 @@ public:
     }
 
     void addReqHeader(const char* start, const char* colon, const char* end){
-    std::string field(start, colon);
-    ++colon;
-    while(colon < end && isspace(*colon)){
+        std::string field(start, colon);
         ++colon;
+        while(colon < end && isspace(*colon)){
+            ++colon;
+        }
+        std::string value(colon, end);
+        while(!value.empty() && isspace(value[value.size() - 1])){
+            value.resize(value.size() - 1);
+        }
+        requestHeaders_[field] = value;
     }
-    std::string value(colon, end);
-    while(!value.empty() && isspace(value[value.size() - 1])){
-        value.resize(value.size() - 1);
-    }
-    requestHeaders_[field] = value;
-    }
+
     std::string getAReqHeader(const std::string& field)const{
         std::string result;
         std::map<std::string, std::string>::const_iterator it = requestHeaders_.find(field);
@@ -174,10 +175,6 @@ public:
         statusCode_ = kUnknownState;
     }
 
-
-
-
-
 private:
     bool processRequestLine(const char* begin, const char* end);
 
@@ -187,7 +184,6 @@ private:
     Version version_;
     HttpRequestParseState state_;
     HttpStatesCode statusCode_;
-
 
     std::string path_;
     std::string query_;
@@ -204,9 +200,5 @@ private:
     Timestamp receiveTime_;
    
     static char favicon[555];
-
 };
-
-
-
 #endif

@@ -135,15 +135,12 @@ void bindOrDie(int sockfd, const struct sockaddr* addr){
     int ret = ::bind(sockfd, addr, sizeof(struct sockaddr_in6));
     if(ret < 0){
         // LOG_SYSFATAL << "bindOrDie in SocketsOPs.cpp.";
-        // printf("The errno is %d", errno);
-        // printf("Error in SocketsOps::bindOrDie\n");
     }
 }
 
 void listenOrDie(int sockfd){
     int ret = ::listen(sockfd, SOMAXCONN);
     if(ret < 0){
-        // printf("Error in SocketsOps::listenOrDie\n");
         // LOG_SYSFATAL << "listenOrDie in SocketsOPs.cpp";
     }
 }
@@ -154,7 +151,6 @@ int accept(int sockfd, struct sockaddr_in6* addr){
     int connfd = ::accept4(sockfd, sockaddr_cast(addr), &addrlen, SOCK_NONBLOCK | SOCK_CLOEXEC);
     if(connfd < 0){
         int savedErrno = errno;
-        // printf("Error in SocketsOps::accept\n");
         // lOG_SYSERR << "accpet in SocketsOps.cpp";
         
         // the meaning of the errno??
@@ -204,7 +200,6 @@ ssize_t write(int sockfd, const void* buf, size_t count){
 
 void close(int sockfd){
     if(::close(sockfd) < 0){
-        // printf("Error in SocketsOps::close\n");
         // LOG_SYSERR << "close in SocketsOps.cpp";
     }
 }
@@ -212,7 +207,6 @@ void close(int sockfd){
 // half-close in tcp
 void shutdownWrite(int sockfd){
     if(::shutdown(sockfd, SHUT_WR) < 0){
-        // printf("Error in sockets::shutdownWrite\n");
         // LOG_SYSERR << "shiutdownWrite in SockertsOps.cpp";
     }
 }
@@ -243,7 +237,6 @@ void fromIpPort(const char* ip, uint16_t port, struct sockaddr_in* addr){
     addr->sin_family = AF_INET;
     addr->sin_port = hostToNetwork16(port);
     if(::inet_pton(AF_INET, ip, &addr->sin_addr) <= 0){
-        // printf("Error in SocketsOps::fromIpPort.\n");
         // LOG_SYSERR << "FromIpPort in SocketsOPs.cpp";
     }
 }
@@ -252,7 +245,6 @@ void fromIpPort(const char* ip, uint16_t port, struct sockaddr_in6* addr){
     addr->sin6_family = AF_INET6;
     addr->sin6_port = hostToNetwork16(port);
     if(::inet_pton(AF_INET6, ip, &addr->sin6_addr) <= 0){
-        // printf("Error in SocketsOps::fromIpPort.\n");
         // LOG_SYSERR << "FromIpPort in SocketsOPs.cpp";
     }
 }
@@ -276,7 +268,6 @@ struct sockaddr_in6 getLocalAddr(int sockfd){
     socklen_t addrlen = static_cast<socklen_t>(sizeof localaddr);
     if(::getsockname(sockfd, sockaddr_cast(&localaddr), &addrlen) < 0){
         // LOG_SYSERR << "getLocalAddr in SocketsOps.cpp";
-        // printf("Error in sockets::getLocalAddr\n");
     }
     return localaddr;
 }
@@ -287,7 +278,6 @@ struct sockaddr_in6 getPeerAddr(int sockfd){
     socklen_t addrlen = static_cast<socklen_t>(sizeof peeraddr);
     if(::getpeername(sockfd, sockaddr_cast(&peeraddr), &addrlen) < 0){
         // LOG_SYSERR << "getPeerAddr in SocketsOPs.cpp";
-        // printf("Error in sockets::getPeerAddr\n");
     }
     return peeraddr;
 }

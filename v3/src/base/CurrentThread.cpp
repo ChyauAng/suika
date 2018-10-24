@@ -12,7 +12,7 @@ namespace CurrentThread{
     __thread int t_tidStringLength = 6;
     __thread int t_cachedPid = 0;
     __thread const char* t_threadName = "Anonymous";
-
+    
     pid_t gettid(){
         return static_cast<pid_t>(syscall(SYS_gettid));
     }

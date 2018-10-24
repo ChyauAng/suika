@@ -66,38 +66,27 @@ public:
     std::shared_ptr<TcpContext> getFreeContext(int connfd){
         std::shared_ptr<TcpContext> tc;
         if(freeContext_->getTData() != NULL){
-            // std::shared_ptr<TcpContext> tc(freeContext_->getTData());
             tc = freeContext_->getTData();
             freeContext_->setTData(tc->getTData());
             tc->setTDataNull();
-            // printf("1 use count is %d\n", tc.use_count());
-            // printf("1 index is %d and the current tid is %d\n", tc->getIndex(), CurrentThread::tid());
         }
         else{
             tc = std::shared_ptr<TcpContext>(new TcpContext(this));
-            // printf("new 1 use count is %d\n", tc.use_count());
-            // printf("1 new index is %d and the current tid is %d\n", tc->getIndex(), CurrentThread::tid());
 
         }
         activeContexts_.push_back(tc);
         tc->setStateKConnected();
         tc->setChannel(connfd);
         tc->configEvent();
-        // printf("The tid and get free TcpContext index is %d %d\n", CurrentThread::tid(), tc->getIndex());
         return tc;
     }
 
     void givebackContext(std::shared_ptr<TcpContext> stc){
-        // printf("2 use count is %d\n", stc.use_count());
-        // stc->setHDataNull();
-        // printf("free index is %d and the current tid is %d\n", stc->getIndex(), CurrentThread::tid());
         stc->setTData(freeContext_->getTData());
         freeContext_->setTData(stc);
         TcpContextList::iterator i = std::find(activeContexts_.begin(), activeContexts_.end(), stc);
         assert(i != activeContexts_.end());
         activeContexts_.erase(i);
-        // printf("3 use count is %d\n", stc.use_count());
-        // printf("The tid and give back TcpContext index is %d %d\n", CurrentThread::tid(), stc->getIndex());
     }
 
 
@@ -131,15 +120,11 @@ private:
     const std::unique_ptr<TimerQueue> timerQueue_;
     // wakeupFd
 
-    // 空闲链表头
-    // std::shared_ptr<TcpContext> tcpContext_;
-    // 指向空闲TcpContext前一个
+    // 连接对象池
     std::shared_ptr<TcpContext> freeContext_;
 
     // doPendingFunctors
     std::vector<Functor> pendingFunctors_;
-    
-    // 连接池
 
     ChannelList activeChannels_;
     TcpContextList activeContexts_;

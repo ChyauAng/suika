@@ -16,12 +16,10 @@ HttpData::HttpData()
 
 HttpData::~HttpData(){
 
-
 }
 
 void HttpData::setHolder(std::shared_ptr<TcpContext> holder){
     holder_ = holder;
-    // std::shared_ptr<TcpContext> temp(holder_);
     holder->setRequestCallback(std::bind(&HttpData::onRequest, this, std::placeholders::_1));
 }
 
@@ -106,12 +104,10 @@ bool HttpData::parseRequest(Buffer* buf, Timestamp receiveTime){
 void HttpData::appendToBuffer(Buffer* output)const{
     std::string crlf("\r\n");
     char buf[32];
-    snprintf(buf, sizeof buf, "HTTP/1.1 %d ", statusCode_);
+    snprintf(buf, sizeof buf, "HTTP/1.1 %d", statusCode_);
     output->append(buf, sizeof buf);
-    // printf("statusMessage is %s\n", statusMessage_.c_str());
     output->append(statusMessage_);
     output->append(crlf);
-
     if(closeConnection_){
         output->append("Connection: close\r\n");
     }
@@ -120,14 +116,12 @@ void HttpData::appendToBuffer(Buffer* output)const{
         output->append(buf, sizeof buf);
         output->append("Connection: Keep-Alive\r\n");
     }
-
     for(std::map<std::string, std::string>::const_iterator it = responseHeaders_.begin(); it != responseHeaders_.end(); it++){
         output->append(it->first);
         output->append(": ");
         output->append(it->second);
         output->append(crlf);
     }
-
     output->append(crlf);
     output->append(body_);
 }
@@ -135,15 +129,12 @@ void HttpData::appendToBuffer(Buffer* output)const{
 
 // 参考HttpServer_test.cpp与HttpServer.[h,cpp]中的onRequest
 void HttpData::onRequest(Buffer* input){
-    // printf("I am here in HttpData::onRequest\n");
     std::shared_ptr<TcpContext> holder(holder_.lock());
     // 解析holder_中的inputBuffer_中内容
     parseRequest(input, Timestamp::now());
-    // printf("path is %s\n", path_.c_str());
     // 生成响应报文至holder_的outputBuffer_o中
     const std::string& connection = getAReqHeader("Connection");
     bool close = (connection == "close" || (version_ == kHttp10 && connection != "Keep-Alive"));
-
     if(path_ == "/"){
         setStatusCode(k200Ok);
         setStatusMessage("Ok");
@@ -156,25 +147,19 @@ void HttpData::onRequest(Buffer* input){
         setStatusMessage("Ok");
         setContentType("image/ico");
         setBody(std::string(HttpData::favicon, sizeof HttpData::favicon));
-        // printf("the size of favicon is %d\n", sizeof(HttpData::favicon));
     }
     else{
         setStatusCode(k404NotFound);
         setStatusMessage("Not Found");
         setCloseConnection(true);
     }
-    
     appendToBuffer(&buf_);
-    // buf.print();
-
     // 在激活写事件时，先写入部分数据，然后再handleWrite()
     holder->send(&buf_);
-
     // shutdown write
     if(close){
         holder->shutdown();
     }
-    
     input->retrieveAll();
     buf_.retrieveAll();
     clearAllContent();

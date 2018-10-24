@@ -37,15 +37,6 @@ public:
         requestCallback_ = std::move(cb);
     }
 
-    // callback functions...
-
-    /*
-    void shutdown();
-    void shutdownInLoop();
-
-    void forceClose();
-    void forceCloseInLoop();
-     */
     void shutdown();
     void shutdownInLoop();
 
@@ -86,8 +77,6 @@ private:
         state_ = s;
     }
 
-    // bool instance in Channel
-    
     StateE state_;
     int index_;
 

@@ -26,7 +26,6 @@ struct ThreadData{
         latch_->countDown();
         latch_ = NULL;
         prctl(PR_SET_NAME, CurrentThread::t_threadName);
-        
         func_();
     }
 };
@@ -60,9 +59,7 @@ Thread::~Thread(){
 void Thread::start(){
     assert(!started_);
     started_ = true;
-
     ThreadData* data = new ThreadData(func_, &tid_, &latch_);
-
     if(pthread_create(&pthreadId_, NULL, &startThread, data)){
         started_ = false;
         delete data;

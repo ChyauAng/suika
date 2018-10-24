@@ -1,4 +1,4 @@
-## myReactorServer性能优化
+## myReactorServer v3特性概述
 
 ### (已完成)
 
@@ -25,7 +25,6 @@
 
 ### (待完成)
 
-* Epoll ET的使用。
 * 多阶段请求异步处理。(类Nginx实现)
 * 内存池的使用。(类Nginx实现)
 * 使用更多针对性能优化的数据结构。(类Redis实现)
@@ -33,3 +32,6 @@
 * 模块化设计。(类Nginx实现)
 * 网络库与应用逻辑分离设计，提高可重用性。
 
+
+### (已放弃方案)
+* Epoll ET的使用。(性能原因，见[v3性能评估.md](https://github.com/ChyauAng/myReactorServer/blob/master/v3/v3性能评估.md))

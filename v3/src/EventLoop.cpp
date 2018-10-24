@@ -31,31 +31,23 @@ EventLoop::EventLoop()
     currentActiveChannel_(NULL),
     poller_(new EPollPoller(this)),
     timerQueue_(new TimerQueue(this)),
-    // tcpContext_(NULL),
     freeContext_(NULL){
-    // do some logging things
-    // LOG_DEBUG
+    // LOG_DEBUG << "init EventLoop";
     if(t_loopInThisThread){
-        // do some logging things
-        // LOG_FATAL: another thread can access this eventloop
+        // LOG_FATAL << "another thread can access this eventloop";
      }
     else{
         t_loopInThisThread = this;
     }
-    
     // wake up the possibly blocked IO thread
     wakeupChannel_->setReadCallback(std::bind(&EventLoop::handleRead, this));
     wakeupChannel_->enableReading();
-    // printf("The wakeup fd is %d\n", wakeupFd_);
-   
    //  initContextPool();
 
 }
 
 EventLoop::~EventLoop(){
     assert(!looping_);
-    // printf("I am here in EventLoop::~EventLoop()\n");
-
     wakeupChannel_->disableAll();
     wakeupChannel_->remove();
     ::close(wakeupFd_);
@@ -72,20 +64,12 @@ void EventLoop::initContextPool(){
         tc->setTData(tct);
         tc = tc->getTData();
     }
-    /*
-    tc = freeContext_;
-    while(tc->getTData() != NULL){
-        printf("%d ", tc->getIndex());
-        tc = tc->getTData();
-    }
-    */
 }
 
 void EventLoop::loop(){
     assert(!looping_);
     assertInLoopThread();
     looping_ = true;
-    // quit_ = false;
     while(!quit_){
         activeChannels_.clear();
         poller_->poll(kPollTimeMs, &activeChannels_);
@@ -99,8 +83,6 @@ void EventLoop::loop(){
         eventHandling_ = false;
         doPendingFunctors();
     }
-
-    // LOG_TRACE
     looping_ = false;
 }
 
@@ -142,32 +124,9 @@ void EventLoop::queueInLoop(Functor&& cb){
     }
 
     if(!isInLoopThread() || callingPendingFunctors_){
-        // printf("I am here in EventLoop::queueInLoop() before wakeup()\n");
         wakeup();
     }
 }
-/*
-void EventLoop::runInLoop(InitFunctor&& cb){
-    if(isInLoopThread()){
-        cb();
-    }
-    else{
-        queueInLoop(std::move(cb));
-    }
-}
-
-void EventLoop::queueInLoop(InitFunctor&& cb){
-    {
-        MutexLockGuard lock(mutex_);
-        pendingFunctors_.push_back(std::move(cb));
-    }
-
-    if(!isInLoopThread() || callingPendingFunctors_){
-        // printf("I am here in EventLoop::queueInLoop() before wakeup()\n");
-        wakeup();
-    }
-*/
-
 void EventLoop::wakeup(){
     uint64_t one = 1;
     ssize_t n = ::write(wakeupFd_, &one, sizeof(one));
@@ -189,16 +148,13 @@ void EventLoop::doPendingFunctors(){
     // narrow the critical area
     std::vector<Functor> functors;
     callingPendingFunctors_ = true;
-
     {
         MutexLockGuard lock(mutex_);
         functors.swap(pendingFunctors_);
     }
-
     for(size_t i = 0; i < functors.size(); i++){
         functors[i]();
     }
-
     callingPendingFunctors_ = false;
 }
 
@@ -212,25 +168,22 @@ void EventLoop::updateChannel(Channel* channel){
 void EventLoop::removeChannel(Channel* channel){
     assert(channel->ownerLoop() == this);
     assertInLoopThread();
-    
-    // to do: take this channel being active channel or not into consideration
+    // TODO: take this channel being active channel or not into consideration
     if(eventHandling_){
         assert(currentActiveChannel_ == channel || std::find(activeChannels_.begin(), activeChannels_.end(), channel) == activeChannels_.end());
     }
-
     poller_->removeChannel(channel);
 }
 
 
 void EventLoop::abortNotInLoopThread(){
-    // do some logging things
-    // LOG_FATAL level
+    // LOG_FATAL << "access this eventloop in wrong thread";
 }
 
 int createEventfd(){
     int evtfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
     if(evtfd < 0){
-        // LOG_SYSERR
+        // LOG_SYSERR << "cannot get right event fd";
         abort();
     }
     return evtfd;

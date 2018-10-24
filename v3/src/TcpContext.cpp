@@ -24,7 +24,6 @@ TcpContext::~TcpContext(){
 }
 
 void TcpContext::send(Buffer* buf){
-    // printf("**************************\n");
     if(state_ == KConnected){
         if(loop_->isInLoopThread()){
             sendInLoop(buf->peek(), buf->readableBytes());
@@ -39,20 +38,15 @@ void TcpContext::send(Buffer* buf){
 
 void TcpContext::sendInLoop(const char* data, size_t len){
     loop_->assertInLoopThread();
-    // printf("The current channel fd is %d\n", channel_->fd());
-    // printf("\n");
     ssize_t nwrote = 0;
     ssize_t remaining = 0;
     bool faultError = false;
-
     if(!channel_->isWriting() && outputBuffer_.readableBytes() == 0){
         nwrote = ::write(channel_->fd(), static_cast<const void*>(data), len);
         if(nwrote >= 0){
-            // printf("I am here in TcpContext::sendInLoop\n");
-            // printf("The writen bytes id %d\n", nwrote);
             remaining = len - nwrote;
             if(remaining > 0){
-                // LOG_TRACE << "I am going to write more data.";
+                LOG_TRACE << "I am going to write more data.";
             }
         }
         else{
@@ -64,18 +58,14 @@ void TcpContext::sendInLoop(const char* data, size_t len){
             }
         }
     }
-
-
     assert(nwrote >= 0);
     if(!faultError && remaining > 0){
-        // printf("TcpContext::sendInLoop() not write completely\n");
         outputBuffer_.append(static_cast<const char*>(data) + nwrote, remaining);
         if(!channel_->isWriting()){
             channel_->enableWriting();
         }
     }
     else if(!faultError && remaining == 0){
-        // printf("TcpContext::sendInLoop() write completely\n");
         // loop_->givebackContext(shared_from_this());
         // handleClose();
     }
@@ -85,22 +75,12 @@ void TcpContext::configEvent(){
     loop_->updateChannel(channel_.get());
     channel_->enableReading();
     hdata_->setHolder(shared_from_this());
-    // printf("The added fd in configEvent is%d\n", channel_->fd());
-    // printf("have completed the TcpContext::configEvent()\n");
 }
 
 void TcpContext::handleRead(){
     int savedErrno = 0;
-    // printf("&&&&&the read channel fd is %d\n", channel_->fd());
     ssize_t n = inputBuffer_.readFd(channel_->fd(), &savedErrno);
-    // printf("The have-read-bytes is %d\n", n);
-
     if(n > 0){
-        //messageCallback(this, &inputBuffer_, t);
-        /*
-        requestCallback_(this, &inputBuffer_);
-        responseCallback_(this, &outputBuffer_);
-        */
         requestCallback_(&inputBuffer_);
     }
     else if(n == 0){
@@ -108,7 +88,7 @@ void TcpContext::handleRead(){
     }
     else{
         errno = savedErrno;
-        // LOG_SYSERR
+        // LOG_SYSERR << "there is a error"
         handleError();
     }
 
@@ -130,8 +110,6 @@ void TcpContext::shutdownInLoop(){
 
 void TcpContext::handleWrite(){
     loop_->assertInLoopThread();
-    // printf("&&&&&the write channel fd is %d\n", channel_->fd());
-    // printf("The current TcpContext index is %d\n", index_);
     if(channel_->isWriting()){
         ssize_t n = ::write(channel_->fd(), outputBuffer_.peek(), outputBuffer_.readableBytes());
         if(n > 0){
@@ -143,10 +121,11 @@ void TcpContext::handleWrite(){
                 }
             }
             else{
+                // LOG_TRACE << "I am going to write more data";
             }
         }
         else{
-            // LOG_SYSERR
+            // LOG_SYSERR << "failed to write fd";
         }
     }
     else{
@@ -156,28 +135,19 @@ void TcpContext::handleWrite(){
 
 void TcpContext::handleClose(){
     loop_->assertInLoopThread();
-    // printf("I am here in TcpContext::handleClose()\n");
-    // printf("************************");
-
     assert(state_ == KConnected || state_ == KDisconnecting);
-
     setState(KDisconnected);
-
     channel_->disableAll();
     ::close(channel_->fd());
     channel_->setFd(-1);
-
     reset();
-
     loop_->runInLoop(std::bind(&EventLoop::removeChannel, loop_, channel_.get()));
     loop_->runInLoop(std::bind(&EventLoop::givebackContext, loop_, shared_from_this()));
-    // printf("the use count after close is %d\n", shared_from_this().use_count() - 1);
 }
 
 void TcpContext::handleError(){
     int err = sockets::getSocketError(channel_->fd());
-    // LOG_ERROR
-
+    // LOG_ERROR << "there is an error, check the errno";
 }
 
 void TcpContext::setChannel(int connfd){

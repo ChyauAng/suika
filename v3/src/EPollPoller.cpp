@@ -13,10 +13,9 @@ const int kAdded = 1;
 const int kDeleted = 2;
 
 EPollPoller::EPollPoller(EventLoop* loop)
-        :epollfd_(epoll_create1(EPOLL_CLOEXEC)),
-        ownerLoop_(loop),
-        events_(EPollPoller::kInitEventListSize)
-{
+    :epollfd_(epoll_create1(EPOLL_CLOEXEC)),
+    ownerLoop_(loop),
+    events_(EPollPoller::kInitEventListSize){
     if(epollfd_ < 0){
         // LOG_SYSFATAL << EPollPoller::EPollPoller";
     }
@@ -55,7 +54,6 @@ void EPollPoller::fillActiveChannels(int numEvents, ChannelList* activeChannels)
     for(int i = 0; i < numEvents; i++){
         Channel* channel= static_cast<Channel*>(events_[i].data.ptr);
         int fd = channel->fd();
-        // printf("The found fd in fillActiveChannels is %d\n", fd);
         ChannelMap::const_iterator it = channels_.find(fd);
         assert(it != channels_.end());
         assert(it->second == channel);
@@ -101,13 +99,10 @@ void EPollPoller::updateChannel(Channel* channel){
 void EPollPoller::removeChannel(Channel* channel){
     assertInLoopThread();
     int fd = channel->fd();
-    // printf("The remove channel fd is %lld\n", fd);
-
     // LOG_TRACE << "fd = " << fd;
     assert(channels_.find(fd) != channels_.end());
     assert(channels_[fd] == channel);
     assert(channel->isNoneEvent());
-    
     int index = channel->index();
     assert(index == kAdded || index == kDeleted);
     size_t n = channels_.erase(fd);
@@ -126,7 +121,6 @@ void EPollPoller::update(int operation, Channel* channel){
     event.events = channel->events();
     event.data.ptr = channel;
     int fd = channel->fd();
-
     // LOG_TRACE << "epoll_ctl op = " << oprerationToString(operation) << " fd = " << fd << " event = {" << channel->eventToString() << "}";
     if(epoll_ctl(epollfd_, operation, fd, &event) < 0){
         if(operation == EPOLL_CTL_DEL){

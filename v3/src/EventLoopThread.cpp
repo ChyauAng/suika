@@ -26,7 +26,6 @@ EventLoopThread::~EventLoopThread(){
 EventLoop* EventLoopThread::startLoop(){
     assert(!thread_.started());
     thread_.start();
-
     {
         MutexLockGuard lock(mutex_);
         while(loop_ == NULL){
@@ -34,27 +33,21 @@ EventLoop* EventLoopThread::startLoop(){
 
         }
     }
-
     return loop_;
 }
 
 void EventLoopThread::threadFunc(){
     EventLoop loop;
-    
     if(callback_){
         callback_(&loop);
     }
-    
     {
         MutexLockGuard lock(mutex_);
         loop_= &loop;
         cond_.notify();
     }
-
     loop.initContextPool();
-    // printf("Context poll init completed\n");
     loop.loop();
-
     loop_ = NULL;
 }
 
