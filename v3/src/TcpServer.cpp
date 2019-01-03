@@ -18,21 +18,19 @@ TcpServer::TcpServer(EventLoop* loop, int threadNum, int port)
 
 }
 
+// threadPool_ 中的连接池需要及时清理掉，交给std::list的默认dtor
 TcpServer::~TcpServer(){
-    // threadPool_ 中的连接池需要及时清理掉，交给std::list的默认dtor
 }
 
 void TcpServer::start(){
     threadPool_->setThreadNum(threadNum_);
     threadPool_->start();
-    // ET模式的话需要在Channel的事件中更改(KReadEvent与KWriteEvent)
-    acceptChannel_->enableReading();
+    acceptChannel_->enableReading();  // ET模式的话需要在Channel的事件中更改(KReadEvent与KWriteEvent)
     acceptChannel_->setReadCallback(std::bind(&TcpServer::handleNewConn, this));
     loop_->updateChannel(acceptChannel_);
 }
 
 void TcpServer::handleNewConn(){
-    // Accptor部分内容
     struct sockaddr_in6 addr;
     bzero(&addr, sizeof addr);
     int connfd = 0;

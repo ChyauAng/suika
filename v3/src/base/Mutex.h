@@ -36,8 +36,7 @@ private:
     pthread_mutex_t mutex_;
 };
 
-// stack object
-// RAII
+// RAII stack object
 class MutexLockGuard: public notCopyable{
 public:
     explicit MutexLockGuard(MutexLock& mutex)

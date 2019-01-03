@@ -22,7 +22,6 @@ class EPollPoller;
 class EventLoop : public notCopyable{
 public:
     typedef std::function<void()> Functor;
-    // typedef std::function<void(int)> InitFunctor;
     EventLoop();
     ~EventLoop();
 
@@ -32,7 +31,6 @@ public:
 
     void assertInLoopThread(){
         if(!isInLoopThread()){
-            // do some logging things
             abortNotInLoopThread();
         }
     }
@@ -53,10 +51,8 @@ public:
     // void runInLoop(InitFunctor&& cb);
     // add the callback function into the task queue of the current thread.
     void queueInLoop(Functor&& cb);
-    // void queueInLoop(InitFunctor&& cb);
     
-    // internal usage
-    void wakeup();
+    void wakeup();  // internal usage
 
     void updateChannel(Channel* channel);
     void removeChannel(Channel* channel);
@@ -89,49 +85,36 @@ public:
         activeContexts_.erase(i);
     }
 
-
 private:
-    // Channel in interest
-    typedef std::vector<Channel*> ChannelList;
+    typedef std::vector<Channel*> ChannelList;  // Channel in interest
     typedef std::vector<std::shared_ptr<TcpContext>> TcpContextList;
 
     void abortNotInLoopThread();
-    // eventfd, wakeup()
-    void handleRead();
-    // todo task in task queue
-    void doPendingFunctors();
+    void handleRead();  // wakeupFd_:eventfd, wakeup()
+    void doPendingFunctors();  // todo task in task queue
 
-    
     bool looping_;
     bool eventHandling_;
     bool quit_;
-    // Fuctors in doPendingFunctors() may call queueInLoop(functor) again, so queueInLoop() should wake up the IO thread.
     bool callingPendingFunctors_;
 
-    // wakeup fd:wakeup(), handleRead()
-    int wakeupFd_;
+    int wakeupFd_;  // Fuctors in doPendingFunctors() may call queueInLoop(functor) again, so queueInLoop() should wake up the IO thread.
     const pid_t threadId_;
 
     Channel* wakeupChannel_;
     Channel* currentActiveChannel_;
     
-    // small functors optimization
-    const std::unique_ptr<EPollPoller> poller_;
+    const std::unique_ptr<EPollPoller> poller_;  // small functors optimization
     const std::unique_ptr<TimerQueue> timerQueue_;
-    // wakeupFd
 
-    // 连接对象池
-    std::shared_ptr<TcpContext> freeContext_;
+    std::shared_ptr<TcpContext> freeContext_;  // 连接对象池
 
-    // doPendingFunctors
     std::vector<Functor> pendingFunctors_;
 
     ChannelList activeChannels_;
     TcpContextList activeContexts_;
 
     MutexLock mutex_;
-
 };
-
 
 #endif

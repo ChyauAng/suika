@@ -10,11 +10,8 @@
 AppendFile::AppendFile(StringArg filename)
     :fp_(fopen(filename.c_str(), "ae")),
     writtenBytes_(0){
-        // close assert when releasing to avoid running time cost
-        assert(fp_);
-        // buffer of file
-        // buffer + flush
-        setbuffer(fp_, buffer_, sizeof buffer_);
+        assert(fp_);  // close assert when releasing to avoid running time cost
+        setbuffer(fp_, buffer_, sizeof buffer_);  // buffer of file, buffer + flush
 }
 
 AppendFile::~AppendFile(){

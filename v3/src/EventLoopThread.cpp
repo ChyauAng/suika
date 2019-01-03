@@ -17,8 +17,7 @@ EventLoopThread::EventLoopThread(const ThreadInitCallback& cb)
 EventLoopThread::~EventLoopThread(){
     existing_ = true;
     if(loop_ != NULL){
-        // not 100% thread safe
-        loop_->quit();
+        loop_->quit();  // not 100% thread safe
         thread_.join();
     }
 }

@@ -30,8 +30,6 @@ private:
     ThreadFunc func_;
 
     CountDownLatch latch_;
-
 };
-
 
 #endif

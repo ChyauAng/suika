@@ -19,9 +19,7 @@ public:
 
     void setHolder(std::shared_ptr<TcpContext> holder);
 
-    // callback functions
-    // 解析请求报文,并生成响应报文
-    void onRequest(Buffer*);
+    void onRequest(Buffer*); // callback functions: 解析请求报文,并生成响应报文
 
     // request part
     enum Method{
@@ -167,7 +165,6 @@ public:
     void clearAllContent(){
         requestHeaders_.clear();
         responseHeaders_.clear();
-
         closeConnection_ = false;
         method_ = kInvalid;
         version_ = kUnknownVersion;
@@ -189,8 +186,7 @@ private:
     std::string query_;
     std::string statusMessage_;
     std::string body_;
-    // HttpRequest, HttpContext, HttpResponse...
-    std::weak_ptr<TcpContext> holder_;
+    std::weak_ptr<TcpContext> holder_;   // HttpRequest, HttpContext, HttpResponse...
 
     Buffer buf_;
     
@@ -201,4 +197,5 @@ private:
    
     static char favicon[555];
 };
+
 #endif

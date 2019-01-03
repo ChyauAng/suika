@@ -75,7 +75,6 @@ int createNonblockingOrDie(sa_family_t family){
     int sockfd = ::socket(family, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
     if(sockfd < 0){
         // LOG_SYSFATAL << "createNonblockingOrDie in SockerOps.cpp.";
-        // printf("Error in Sockets::createNonblockinOrDie\n");
     }
     return sockfd;
 }
@@ -84,31 +83,25 @@ int socketBindListen(int port){
     if(port < 0 || port > 65535){
         return -1;
     }
-
     int listenFd = 0;
     if((listenFd = ::socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0)) == -1){
         return -1;
     }
-
     struct sockaddr_in server_addr;
     bzero((char*)&server_addr, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     server_addr.sin_port = htons((unsigned short)port);
-
     if(::bind(listenFd, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1){
         return -1;
     }
-
     if(::listen(listenFd, 2048) == -1){
         return -1;
     }
-
     if(listenFd == -1){
         close(listenFd);
         return -1;
     }
-
     return listenFd;
 }
 
@@ -117,9 +110,7 @@ int setSocketNonBlocking(int fd){
     if(flag == -1){
         return -1;
     }
-
     flag |= O_NONBLOCK;
-
     if(fcntl(fd, F_SETFL, flag) == -1){
         return -1;
     }
@@ -153,7 +144,6 @@ int accept(int sockfd, struct sockaddr_in6* addr){
         int savedErrno = errno;
         // lOG_SYSERR << "accpet in SocketsOps.cpp";
         
-        // the meaning of the errno??
         switch (savedErrno){
             // temporary error
             case EAGAIN:
@@ -252,9 +242,7 @@ void fromIpPort(const char* ip, uint16_t port, struct sockaddr_in6* addr){
 int getSocketError(int sockfd){
     int optval;
     socklen_t optlen = static_cast<socklen_t>(sizeof optval);
-
-    // get options at the socket api level on sockets
-    if(::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, &optlen) < 0){
+    if(::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, &optlen) < 0){  // get options at the socket api level on sockets
         return errno;
     }
     else{
@@ -301,8 +289,7 @@ bool isSelfConnect(int sockfd){
 void setTcpNoDelay(int sockfd, bool on){
     int optval = on ? 1 : 0;
     int ret = setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &optval, static_cast<socklen_t>(sizeof optval));
-    if(ret < 0 && on){
-        // 0 : success; -1 : error, and errno be set.
+    if(ret < 0 && on){  // 0 : success; -1 : error, and errno be set.
         // LOG_ERROR << "TCP_NODELAY failed.";
     }
 }
@@ -329,6 +316,5 @@ void setKeepAlive(int sockfd, bool on){
     if(ret < 0 && on){
         // LOG_ERROR << "SO_KEEPALIVE failed.";
     }
-
 }
 }

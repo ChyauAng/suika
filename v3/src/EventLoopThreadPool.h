@@ -31,7 +31,6 @@ public:
         return started_;
     }
 
-
 private:
     bool started_;
 
@@ -43,6 +42,5 @@ private:
     std::vector<EventLoopThread*> threads_;
     std::vector<EventLoop*> loops_;
 };
-
 
 #endif

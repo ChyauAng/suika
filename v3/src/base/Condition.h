@@ -27,10 +27,7 @@ public:
     bool waitForSeconds(int seconds){
         struct timespec relativetime;
         clock_gettime(CLOCK_MONOTONIC, &relativetime);
-
-
         relativetime.tv_sec += static_cast<time_t>(seconds);
-
         return ETIMEDOUT == pthread_cond_timedwait(&pcond_, mutex_.getMutex(), &relativetime);
     }
 

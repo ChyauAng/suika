@@ -7,10 +7,8 @@
 #include <string.h>
 #include <string>
 
-// 4kb
-const int kSmallBuffer = 4000;
-// 4mb
-const int kLargeBuffer = 4000 * 1000;
+const int kSmallBuffer = 4000;  // 4kb
+const int kLargeBuffer = 4000 * 1000;  // 4mb
 
 // Buffer with size SIZE
 template<int SIZE>
@@ -57,7 +55,6 @@ public:
      void bzeroInner(){
          bzero(data_, sizeof data_);
      }
-
 
 private:
     const char* end() const{
@@ -169,6 +166,5 @@ inline LogStream& operator<<(LogStream& s, const Fmt& fmt){
     s.append(fmt.data(), fmt.length());
     return s;
 }
-
 
 #endif

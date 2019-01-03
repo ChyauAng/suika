@@ -18,8 +18,9 @@ EventLoopThreadPool::EventLoopThreadPool(EventLoop* loop)
 
 }
 
+// stack variable thus no need to delete loop_
 EventLoopThreadPool::~EventLoopThreadPool(){
-    // stack variable thus no need to delete loop_
+
 }
 
 void EventLoopThreadPool::start(const ThreadInitCallback& cb){

@@ -14,8 +14,7 @@ const char Buffer::kCRLF[] = "\r\n";
 const size_t Buffer::KInitialSize;
 
 ssize_t Buffer::readFd(int fd, int* savedErrno){
-    // when buffer space is not enough, write in the extrabuf first, then write to the buffer, to save an ioctl()/FIONREAD call cost
-    char extrabuf[65536];
+    char extrabuf[65536];  // when buffer space is not enough, write in the extrabuf first, then write to the buffer, to save an ioctl()/FIONREAD call cost
     struct iovec vec[2];
     const size_t writable = writableBytes();
     vec[0].iov_base =  buf_ + writerIndex_;
@@ -23,8 +22,7 @@ ssize_t Buffer::readFd(int fd, int* savedErrno){
     vec[1].iov_base = extrabuf;
     vec[1].iov_len = 65536;
     const int iovcnt = (writable < sizeof extrabuf)? 2 : 1;
-    // multi-buffer read operation
-    const ssize_t n = sockets::readv(fd, vec, iovcnt);
+    const ssize_t n = sockets::readv(fd, vec, iovcnt);  // multi-buffer read operation
     if(n < 0){
         *savedErrno = errno;
     }

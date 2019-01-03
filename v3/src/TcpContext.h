@@ -90,16 +90,12 @@ private:
     void handleClose();
     void handleError();
 
-    // 当在连接池中时，作为指针指向下一个空闲连接
-    std::shared_ptr<TcpContext> tdata_;
-    // 从连接池中取出时，作为指针指向数据
-    std::shared_ptr<HttpData> hdata_;
-    // socket fd...
-    std::shared_ptr<Channel> channel_;
+    std::shared_ptr<TcpContext> tdata_;  // 当在连接池中时，作为指针指向下一个空闲连接
+    std::shared_ptr<HttpData> hdata_;  // 从连接池中取出时，作为指针指向数据
+    std::shared_ptr<Channel> channel_;  // socket fd...
 
     Buffer inputBuffer_;
     Buffer outputBuffer_;
-
 };
 
 #endif

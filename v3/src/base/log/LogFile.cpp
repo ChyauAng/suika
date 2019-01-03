@@ -47,7 +47,6 @@ void LogFile::flush(){
 
 void LogFile::append_unlocked(const char* logline, int len){
     file_->append(logline, len);
-
     if(file_->writtenBytes() > rollSize_){
         rollFile();
     }
@@ -78,17 +77,14 @@ bool LogFile::rollFile(){
         lastRoll_ = now;
         lastFlush_= now;
         startOfPeriod_ = start;
-        // reset directly
-        file_.reset(new AppendFile(filename));
+        file_.reset(new AppendFile(filename));  // reset directly
         return true;
     }
     return false;
 }
 
 std::string hostname(){
-    // HOST_NAME_MAX 64
-    // _POSIX_HOST_NAME_MAX 255
-    char buf[256];
+    char buf[256];  // HOST_NAME_MAX 64, _POSIX_HOST_NAME_MAX 255
     if(gethostname(buf, sizeof buf) == 0){
         buf[sizeof(buf) - 1] = '\0';
         return buf;
@@ -103,25 +99,17 @@ std::string LogFile::getLogFileName(const std::string basename, time_t* now){
     std::string filename;
     filename.reserve(basename.size() + 64);
     filename = basename;
-
     char timebuf[32];
     struct tm tm;
     *now = time(NULL);
     gmtime_r(now, &tm);
     strftime(timebuf, sizeof timebuf, ".%Y%m%d-%H%M%S.", &tm);
     filename += timebuf;
-
-    // filename += ProcessInfo::hostname();
     filename += hostname();
-    
-
     char pidbuf[32];
-    // snprintf(pidbuf, sizeof pidbuf, ".%d", ProcessInfo::pid());
     snprintf(pidbuf, sizeof pidbuf, ".%d", CurrentThread::pid());
     filename += pidbuf;
-
     filename += ".log";
-
     return filename;
 }
 

@@ -49,8 +49,7 @@ public:
         return events_ == kNoneEvent;
     }
     void enableReading(){
-        // 相应位变１
-        events_ |= kReadEvent;
+        events_ |= kReadEvent;  // 相应位变１
         update();
     }
     void enableWriting(){
@@ -58,8 +57,7 @@ public:
         update();
     }
     void disableWriting(){
-        // 相应位变０
-        events_ &= ~kWriteEvent;
+        events_ &= ~kWriteEvent;  // 相应位变０
         update();
     }
     void disableAll(){
@@ -67,8 +65,7 @@ public:
         update();
     }
 
-    // for Poller
-    int index(){
+    int index(){  // for Poller
         return index_;
     }
     void setIndex(int idx){
@@ -79,8 +76,7 @@ public:
         return loop_;
     }
     
-    // TimerQueue.h
-    void remove();
+    void remove();  // TimerQueue.h
 
     bool isReading() const{
         return events_ & kReadEvent;
@@ -112,8 +108,7 @@ private:
     int fd_;
     int events_;
     int revents_;
-    // used by Poller
-    int index_;
+    int index_;  // used by Poller
 
     EventLoop* loop_;
 
@@ -122,10 +117,7 @@ private:
     EventCallback errorCallback_;
     EventCallback closeCallback_;
 
-    // 解决从连接池取出连接后将栈上连接实体(TcpContext)置于哪里的问题
-    std::weak_ptr<TcpContext> holder_;
+    std::weak_ptr<TcpContext> holder_;  // 解决从连接池取出连接后将栈上连接实体(TcpContext)置于哪里的问题
 };
-
-
 
 #endif

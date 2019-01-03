@@ -39,11 +39,8 @@ EventLoop::EventLoop()
     else{
         t_loopInThisThread = this;
     }
-    // wake up the possibly blocked IO thread
-    wakeupChannel_->setReadCallback(std::bind(&EventLoop::handleRead, this));
+    wakeupChannel_->setReadCallback(std::bind(&EventLoop::handleRead, this));  // wake up the possibly blocked IO thread
     wakeupChannel_->enableReading();
-   //  initContextPool();
-
 }
 
 EventLoop::~EventLoop(){
@@ -51,7 +48,6 @@ EventLoop::~EventLoop(){
     wakeupChannel_->disableAll();
     wakeupChannel_->remove();
     ::close(wakeupFd_);
-
     t_loopInThisThread = NULL;
 }
 
@@ -107,7 +103,6 @@ TimerId EventLoop::runEvery(double interval, TimerCallback&& cb){
     return timerQueue_->addTimer(std::move(cb), time, interval);
 }
 
-
 void EventLoop::runInLoop(Functor&& cb){
     if(isInLoopThread()){
         cb();
@@ -122,7 +117,6 @@ void EventLoop::queueInLoop(Functor&& cb){
         MutexLockGuard lock(mutex_);
         pendingFunctors_.push_back(std::move(cb));
     }
-
     if(!isInLoopThread() || callingPendingFunctors_){
         wakeup();
     }
@@ -132,7 +126,7 @@ void EventLoop::wakeup(){
     ssize_t n = ::write(wakeupFd_, &one, sizeof(one));
     assert(n == one);
     if(n != sizeof one){
-        // LOG_ERROR;
+        // LOG_ERROR << "failed to wake up eventloop";
     }
 }
 
@@ -140,13 +134,12 @@ void EventLoop::handleRead(){
     uint64_t one = 1;
     ssize_t n = ::read(wakeupFd_, &one, sizeof(one));
     if(n != sizeof(one)){
-        // LOG_ERROR
+        // LOG_ERROR << "failed to handle read event of eventloop";
     }
 }
 
 void EventLoop::doPendingFunctors(){
-    // narrow the critical area
-    std::vector<Functor> functors;
+    std::vector<Functor> functors;  // narrow the critical area
     callingPendingFunctors_ = true;
     {
         MutexLockGuard lock(mutex_);

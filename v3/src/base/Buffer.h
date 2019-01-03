@@ -8,8 +8,6 @@
 
 #include "StringPiece.h"
 
-// #include "StringPiece.h"
-
 class Buffer{
 public:
     static const size_t KInitialSize = 1024;
@@ -77,8 +75,10 @@ public:
         retrieve(end - peek());
     }
     
-    // sendInLoop(.., Buffer::getBuf(), Buffer::readbleBytes())
-    // buf->retrieveReadable()
+    /*
+    sendInLoop(.., Buffer::getBuf(), Buffer::readbleBytes())
+    buf->retrieveReadable()
+    */
     void retrieveReadable(){
         int length = readableBytes();
         retrieve(length);
@@ -89,17 +89,10 @@ public:
     }
 
     void append(const char* data, size_t len){
-        // printf("The append content is %s\n", data);
         ensureWritableBytes(len);
         strncpy(beginWrite(), data, len);
         hasWritten(len);
     }
-
-    /*
-    void append(const StringPiece& sp){
-        append(sp.data(), sp.size());
-    }
-    */
 
     void ensureWritableBytes(size_t len){
         if(writableBytes() < len){
@@ -136,7 +129,6 @@ public:
     ssize_t readFd(int fd, int* savedErrno);
 
 private:
-    
     void makeSpace(size_t len){
         size_t newlen = writerIndex_ + len;
         len_ = newlen;
@@ -155,8 +147,7 @@ private:
     size_t writerIndex_;
 
     size_t len_;
-    // preallocation length
-    size_t free_;
+    size_t free_;   // preallocation length
 
     char* buf_;
 

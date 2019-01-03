@@ -14,7 +14,7 @@ public:
     explicit Timestamp(int64_t microSecondsSinceEpochArg)
         :microSecondsSinceEpoch_(microSecondsSinceEpochArg){
         
-        }
+    }
 
     ~Timestamp(){
 
@@ -39,7 +39,6 @@ public:
         return microSecondsSinceEpoch_ > 0;
     }
 
-    // get function
     int64_t microSecondsSinceEpoch() const{
         return microSecondsSinceEpoch_;
     }
@@ -60,6 +59,5 @@ inline Timestamp addTime(Timestamp timestamp, double seconds){
     int64_t delta = static_cast<int64_t>(seconds * Timestamp::kMicroSecondsPerSecond);
     return Timestamp(timestamp.microSecondsSinceEpoch() + delta);
 }
-
 
 #endif

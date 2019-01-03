@@ -7,8 +7,7 @@
 #include "Channel.h"
 #include "EPollPoller.h"
 
-// for Channel, default index is -1
-const int kNew = -1;
+const int kNew = -1;  // for Channel, default index is -1
 const int kAdded = 1;
 const int kDeleted = 2;
 
@@ -17,7 +16,7 @@ EPollPoller::EPollPoller(EventLoop* loop)
     ownerLoop_(loop),
     events_(EPollPoller::kInitEventListSize){
     if(epollfd_ < 0){
-        // LOG_SYSFATAL << EPollPoller::EPollPoller";
+        // LOG_SYSFATAL << "EPollPoller::EPollPoller";
     }
 }
 
@@ -29,7 +28,6 @@ void EPollPoller::poll(int timeoutMs, ChannelList* activeChannels){
     // LOG_TRACE << "fd total count " << channels_size();
     int numEvents = epoll_wait(epollfd_, &*events_.begin(), static_cast<int>(events_.size()), timeoutMs);
     int savedErrno = errno;
-    // Timestamp now(Timestamp::now());
     if(numEvents > 0){
         // LOG_TRACE << numEvents << " events happened";
         fillActiveChannels(numEvents, activeChannels);
@@ -41,8 +39,7 @@ void EPollPoller::poll(int timeoutMs, ChannelList* activeChannels){
         // LOG_TRACE << "nothing happened.";
     }
     else{
-        // if the error is not caused by some signal interrupting the system call
-        if(savedErrno != EINTR){
+        if(savedErrno != EINTR){  // if the error is not caused by some signal interrupting the system call
             errno = savedErrno;
             // LOG_SYSERR << "EPollPoller::poll()";
         }
@@ -57,7 +54,6 @@ void EPollPoller::fillActiveChannels(int numEvents, ChannelList* activeChannels)
         ChannelMap::const_iterator it = channels_.find(fd);
         assert(it != channels_.end());
         assert(it->second == channel);
-
         channel->set_revents(events_[i].events);
         activeChannels->push_back(channel);
     }

@@ -20,30 +20,23 @@ public:
     TimerQueue(EventLoop* loop);
     ~TimerQueue();
 
-    // schedules the callback to be run at given time
-    TimerId addTimer(TimerCallback&& cb, Timestamp when, double interval);
-
+    TimerId addTimer(TimerCallback&& cb, Timestamp when, double interval);  // schedules the callback to be run at given time
 
     void cancel(TimerId timerId);
 
 private:
-    // binary search tree
-    // other options: linear list or priority queue based on binary heap(LinYaCool::Websever)
-    typedef std::pair<Timestamp, Timer*> Entry;
+    typedef std::pair<Timestamp, Timer*> Entry;  // BST or other options: linear list or priority queue based on binary heap(LinYaCool::Websever)
     typedef std::set<Entry> TimerList;
     typedef std::pair<Timer*, int64_t> ActiveTimer;
     typedef std::set<ActiveTimer> ActiveTimerSet;
 
     void addTimerInLoop(Timer* timer);
     void cancelInLoop(TimerId timerId);
-    // handle the readable timefd event
-    void handleRead();
+    void handleRead();  // handle the readable timefd event
 
-    // get the expired timer
-    std::vector<Entry> getExpired(Timestamp now);
+    std::vector<Entry> getExpired(Timestamp now);  // get the expired timer
     void reset(const std::vector<Entry>& expired, Timestamp now);
     bool insert(Timer* timer);
-
 
     bool callingExpiredTimers_;
 
@@ -53,15 +46,10 @@ private:
 
     std::shared_ptr<Channel> timerfdChannel_;
 
-    // timers sorted by expiration
-    TimerList timers_;
-    // for calcel()
-    // timers sorted by object addresses
-    ActiveTimerSet activeTimers_;
-    // avoid self-unregister
-    ActiveTimerSet cancelingTimers_;
-
-
+    TimerList timers_;  // timers sorted by expiration
+    
+    ActiveTimerSet activeTimers_;  // for calcel() and timers sorted by object addresses
+    ActiveTimerSet cancelingTimers_;  // avoid self-unregister
 };
 
 
@@ -70,20 +58,18 @@ public:
     TimerId()
         :sequence_(0),
         timer_(NULL){
-        
     }
 
     TimerId(Timer* timer, int seq)
         :sequence_(seq),
         timer_(timer){
-   
     }
 
     friend class TimerQueue;
 
 private:
     int sequence_;
-
     Timer* timer_;
 };
+
 #endif

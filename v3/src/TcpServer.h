@@ -28,22 +28,7 @@ private:
 
     Channel* acceptChannel_;
     const std::unique_ptr<EventLoopThreadPool> threadPool_;
-
-
-
 };
-
-
-
-
-
-
-
-
-
-
-
-
 
 #endif
 

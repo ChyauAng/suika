@@ -101,7 +101,6 @@ void TimerQueue::handleRead(){
     Timestamp now(Timestamp::now());
     readTimerfd(timerfd_, now);
     std::vector<Entry> expired = getExpired(now);
-    // TimerQueue::cancel()
     callingExpiredTimers_ = true;
     cancelingTimers_.clear();
     for(std::vector<Entry>::iterator it = expired.begin(); it != expired.end(); ++it){
@@ -157,8 +156,6 @@ bool TimerQueue::insert(Timer* timer){
 
 
 int createTimerfd(){
-    // CLOCK_MONOTONIC: time after the system starts
-    // CLOCK_REALTIME: real time
     int timerfd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
     if(timerfd < 0){
         // LOG_SYSDFATAL << "failed to create timer fd";

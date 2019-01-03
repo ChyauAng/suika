@@ -26,8 +26,7 @@ public:
         inline SourceFile(const char (&arr)[N])
             :data_(arr),
             size_(N - 1){
-                // gcc built-in function
-                const char* slash = strrchr(data_, '/'); 
+                const char* slash = strrchr(data_, '/'); // gcc built-in function
                 if(slash){
                     data_ = slash + 1;
                     size_ -= static_cast<int>(data_ - arr);
@@ -67,7 +66,6 @@ public:
     static void setFlush(FlushFunc);
 
 private:
-
     class Impl{
     public:
         typedef Logger::LogLevel LogLevel;
@@ -116,6 +114,5 @@ T* CheckNotNull(Logger::SourceFile file, int line, const char* names, T* ptr){
     }
     return ptr;
 }
-
 
 #endif

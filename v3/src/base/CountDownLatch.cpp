@@ -9,8 +9,7 @@ CountDownLatch::CountDownLatch(int count)
 
 void CountDownLatch::wait(){
     MutexLockGuard lock(mutex_);
-    // loop condition
-    while(count_ > 0){
+    while(count_ > 0){  // loop condition
         condition_.wait();
     }
 }

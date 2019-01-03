@@ -16,13 +16,11 @@ public:
          sequence_(__sync_fetch_and_add(&s_numCreated_, 1) + 1){
 
     }
-    
     // callback
     void run() const{
         callback_();
     }
     
-    // get functions
     Timestamp expiration() const{
         return expiration_;
     }
@@ -35,10 +33,8 @@ public:
     static int64_t numCreated(){
         return __sync_val_compare_and_swap(&s_numCreated_, 0, 0);
     }
-    
 
     void restart(Timestamp now);
-
 
 private:
     const bool repeat_;
@@ -48,7 +44,6 @@ private:
     const TimerCallback callback_;
     Timestamp expiration_;
     const double interval_;
-    // identity the object
 
     static int s_numCreated_;
 };
