@@ -46,7 +46,7 @@ void TcpContext::sendInLoop(const char* data, size_t len){
         if(nwrote >= 0){
             remaining = len - nwrote;
             if(remaining > 0){
-                LOG_TRACE << "I am going to write more data.";
+                // LOG_TRACE << "I am going to write more data.";
             }
         }
         else{

@@ -1,3 +1,3 @@
-# myReactorServer: a web server based on myReactor
-## myReactor: a reactor implementation
+# suika: a web server based on muduo++
+## muduo++: a muduo-like reactor implementation
 

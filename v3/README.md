@@ -1,4 +1,4 @@
-## myReactorServer v3特性概述
+## suika v3特性概述
 
 ### (已完成)
 
@@ -34,4 +34,4 @@
 
 
 ### (已放弃方案)
-* Epoll ET的使用。(性能原因，见[v3性能评估.md](https://github.com/ChyauAng/myReactorServer/blob/master/v3/v3性能评估.md))
+* Epoll ET的使用。(性能原因，见[v3性能评估.md](https://github.com/ChyauAng/suika/blob/master/v3/v3性能评估.md))
